@@ -137,6 +137,19 @@ async function basicRouteTests(port) {
     "GET /signup (with already signed in User); redirect location: home page"
   );
   assert(responseSignUp.headers.get("set-cookie") == undefined);
+
+  // -----------------------------------------------------------------
+  // POST  /signup with already signed user
+  // -----------------------------------------------------------------
+
+  responseSignUp = await fetch(`${baseUrl}/signup`, {
+    method: "POST",
+    headers: { Cookie: signUpResponseCookieHeader },
+    redirect: "manual",
+  });
+  
+  
+  assert(responseSignUp.headers.get("set-cookie") == undefined);
   
 }
 let port;

@@ -34,6 +34,10 @@ export default function launch(port) {
   });
 
   app.post("/signup", (request, response) => {
+    if (request.cookies["_twirl"]) {
+      return response.redirect("/home");
+    }
+
     const username = request.body.username;
     if (users.hasOwnProperty(username)) {
       return response.send("Username already exists");
@@ -51,9 +55,10 @@ export default function launch(port) {
   });
 
   app.post("/login", (request, response) => {
+    if (request.cookies["_twirl"]) {
+      return response.redirect("/home");
+    }
     let username = request.body.username;
-    // console.log(users);
-    // console.log(username);
     if (users.hasOwnProperty(username)) {
       response.cookie("_twirl", username, { maxAge: 9000000, httpOnly: true });
       return response.redirect("/home");
@@ -65,7 +70,6 @@ export default function launch(port) {
 
   app.all("/logout", (request, response) => {
     response.clearCookie("_twirl");
-    console.log("Logged out");
     response.redirect("/login");
   });
 
