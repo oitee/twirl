@@ -14,11 +14,11 @@ function freePort() {
 
 async function basicRouteTests(port) {
   let baseUrl = `http://localhost:${port}`;
-
+  let response;
   // -----------------------------------------------------------------
   // GET /
   // -----------------------------------------------------------------
-  let response = await fetch(baseUrl, {
+  response = await fetch(baseUrl, {
     method: "GET",
     redirect: "manual",
   });
@@ -116,6 +116,23 @@ async function basicRouteTests(port) {
     "GET /login (with already signed in User); redirect location: home page"
   );
   assert(responseLogIn.headers.get("set-cookie") == undefined);
+
+  // -----------------------------------------------------------------
+  // GET /home with already signed user
+  // -----------------------------------------------------------------
+
+  response = await fetch(`${baseUrl}/home`, {
+    method: "GET",
+    headers: { Cookie: signUpResponseCookieHeader },
+    redirect: "manual",
+  });
+  assert.equal(
+    response.status,
+    200,
+    "GET /home (with already signed user); status should be 200"
+  );
+  assert((await response.text()).includes(`Welcome, user1`));
+  assert(response.headers.get("set-cookie") == undefined);
 
   // -----------------------------------------------------------------
   // GET /signup with already signed user
