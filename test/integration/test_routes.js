@@ -184,6 +184,25 @@ async function basicRouteTests(port) {
     cookieObj["Expires"] === "Thu, 01 Jan 1970 00:00:00 GMT",
     "GET /logout response should set new cookie dated to UNIX epoch"
   );
+
+  // -----------------------------------------------------------------
+  // POST /signup with already existing username
+  // -----------------------------------------------------------------
+  response = await fetch(`${baseUrl}/signup`, {
+    method: "POST",
+    redirect: "manual",
+    body: parameters,
+  });
+  assert(
+    (await response.text()).includes("Username already exists"),
+    "POST /signup with existing username. Body should contain error message"
+  );
+  assert.equal(
+    response.status,
+    200,
+    "POST /signup with already existing username; status should be 200"
+  );
+  assert(responseLogIn.headers.get("set-cookie") == undefined);
 }
 let port;
 let server;
