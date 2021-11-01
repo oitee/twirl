@@ -1,0 +1,19 @@
+{
+  "name": "twirl",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oitee/twirl.git"
+  },
+  "author": "Otee",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/oitee/twirl/issues"
+  },
+  "homepage": "https://github.com/oitee/twirl#readme"
+}
