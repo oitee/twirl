@@ -2,9 +2,10 @@
   "name": "twirl",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon $1"
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,13 @@
   "bugs": {
     "url": "https://github.com/oitee/twirl/issues"
   },
-  "homepage": "https://github.com/oitee/twirl#readme"
+  "homepage": "https://github.com/oitee/twirl#readme",
+  "devDependencies": {
+    "jest": "^27.3.1",
+    "nodemon": "^2.0.14"
+  },
+  "type": "module",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
