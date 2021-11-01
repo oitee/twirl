@@ -23,7 +23,7 @@ async function basicRouteTests(port) {
     redirect: "manual",
   });
   assert(response.status === 302, "GET / status is 302");
-  assert(response.headers.get("set-cookie") == undefined);  
+  assert(response.headers.get("set-cookie") == undefined);
 
   // -----------------------------------------------------------------
   // GET /login
@@ -38,7 +38,7 @@ async function basicRouteTests(port) {
     responseBody.includes(`<title>Twirl | Log-in</title>`),
     "GET /login returns the correct page"
   );
-  assert(redirectResponse.headers.get("set-cookie") == undefined);  
+  assert(redirectResponse.headers.get("set-cookie") == undefined);
 
   // -----------------------------------------------------------------
   // POST /login (with non-existing credentials)
@@ -147,10 +147,26 @@ async function basicRouteTests(port) {
     headers: { Cookie: signUpResponseCookieHeader },
     redirect: "manual",
   });
-  
-  
   assert(responseSignUp.headers.get("set-cookie") == undefined);
-  
+
+  // -----------------------------------------------------------------
+  // GET  /logout
+  // -----------------------------------------------------------------
+
+  let responseLogOut = await fetch(`${baseUrl}/logout`, {
+    method: "GET",
+    headers: { Cookie: signUpResponseCookieHeader },
+    redirect: "manual",
+  });
+  cookieObj = cookie.parse(responseLogOut.headers.get("set-cookie"));
+  assert(
+    cookieObj["_twirl"] === "",
+    "GET /logout response should not contain value of cookie"
+  );
+  assert(
+    cookieObj["Expires"] === "Thu, 01 Jan 1970 00:00:00 GMT",
+    "GET /logout response should set new cookie dated to UNIX epoch"
+  );
 }
 let port;
 let server;
