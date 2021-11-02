@@ -4,6 +4,7 @@ import express from "express";
 import fetch from "node-fetch";
 import cookie from "cookie";
 import { SESSION_COOKIE } from "../../src/constants.js";
+import { pool } from "../../src/db/connection.js";
 
 function freePort() {
   const testApp = express();
@@ -208,12 +209,27 @@ async function basicRouteTests(port) {
 let port;
 let server;
 
-beforeAll(() => {
+beforeAll(async () => {
+  await pool.query(`
+  DROP TABLE IF EXISTS users;
+  DROP TABLE IF EXISTS roles;
+  CREATE TABLE roles (
+    id SERIAL PRIMARY KEY,
+    name TEXT);
+  CREATE TABLE users (
+    id UUID PRIMARY KEY,
+    username TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE,
+    role_id INTEGER REFERENCES roles (id));
+  INSERT INTO roles (name) values ('admin') , ('normal'), ('superAdmin');`);
+  
   port = freePort();
   server = launch(port);
 });
-afterAll(() => {
+afterAll(async () => {
   server.close();
+  await pool.end();
 });
 
 test("Basic router tests", () => basicRouteTests(port));

@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  postgres:
+    # Docker Hub image
+    image: postgres:14
+    # Provide the password for postgres
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    ports:
+      - '5432:5432'
+    volumes:
+      - './tmp/volumes/postgres:/var/lib/postgresql/data'
+
