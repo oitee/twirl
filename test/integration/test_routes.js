@@ -178,7 +178,7 @@ async function basicRouteTests(port) {
   });
   cookieObj = cookie.parse(responseLogOut.headers.get("set-cookie"));
   assert(
-    cookieObj["_twirl"] === "",
+    cookieObj.hasOwnProperty("_twirl"),
     "GET /logout response should not contain value of cookie"
   );
   assert(

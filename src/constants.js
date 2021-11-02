@@ -6,3 +6,5 @@ export const UNAUTHENTICATED_ROUTES = baseRouts.map((route) =>
 );
 
 export const SESSION_COOKIE = "_twirl";
+
+export const COOKIE_SECRET = process.env.COOKIE_SECRET;

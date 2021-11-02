@@ -10,12 +10,12 @@ function auth(request, response, next) {
   if (
     UNAUTHENTICATED_ROUTES.some((routeRegEx) => routeRegEx.exec(request.path))
   ) {
-    if (request.cookies[SESSION_COOKIE]) {
+    if (request.signedCookies[SESSION_COOKIE]) {
       return response.redirect("/home");
     }
     return next();
   }
-  if (!request.cookies[SESSION_COOKIE]) {
+  if (!request.signedCookies[SESSION_COOKIE]) {
     return response.redirect("/login");
   }
   return next();

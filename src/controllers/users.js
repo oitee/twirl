@@ -2,7 +2,9 @@ import { SESSION_COOKIE } from "../constants.js";
 const users = {};
 
 export function home(request, response) {
-  return response.render("home.mustache", { username: request.cookies["_twirl"] });
+  return response.render("home.mustache", {
+    username: request.signedCookies[SESSION_COOKIE],
+  });
 }
 
 export function initiateSignUp(request, response) {
@@ -15,7 +17,11 @@ export function create(request, response) {
     return response.send("Username already exists");
   }
   users[username] = request.body.password;
-  response.cookie(SESSION_COOKIE, username, { maxAge: 9000000, httpOnly: true });
+  response.cookie(SESSION_COOKIE, username, {
+    maxAge: 9000000,
+    httpOnly: true,
+    signed: true,
+  });
   return response.redirect("/home");
 }
 
@@ -26,7 +32,11 @@ export function initiateLogIn(request, response) {
 export function createSession(request, response) {
   let username = request.body.username;
   if (users.hasOwnProperty(username)) {
-    response.cookie(SESSION_COOKIE, username, { maxAge: 9000000, httpOnly: true });
+    response.cookie(SESSION_COOKIE, username, {
+      maxAge: 9000000,
+      httpOnly: true,
+      signed: true,
+    });
     return response.redirect("/home");
   }
   return response.render("login.mustache", {
