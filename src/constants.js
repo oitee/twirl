@@ -4,3 +4,5 @@ const baseRouts = ["/signup", "/login"];
 export const UNAUTHENTICATED_ROUTES = baseRouts.map((route) =>
   pathToReg(route)
 );
+
+export const SESSION_COOKIE = "_twirl";
