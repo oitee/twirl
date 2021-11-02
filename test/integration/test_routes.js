@@ -50,8 +50,9 @@ async function basicRouteTests(port) {
     method: "POST",
     body: parameters,
   });
-  assert(
-    loginResponse.status === 200,
+  assert.equal(
+    loginResponse.status,
+    200,
     "POST /login with wrong credentials, returns status 200"
   );
   assert(
