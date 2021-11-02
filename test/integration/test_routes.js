@@ -3,6 +3,7 @@ import assert from "assert";
 import express from "express";
 import fetch from "node-fetch";
 import cookie from "cookie";
+import { SESSION_COOKIE } from "../../src/constants.js";
 
 function freePort() {
   const testApp = express();
@@ -76,8 +77,7 @@ async function basicRouteTests(port) {
   );
   let stringCookie = signUpResponse.headers.get("set-cookie");
   let cookieObj = cookie.parse(stringCookie);
-  let signUpResponseCookieHeader = `_twirl=${cookieObj["_twirl"]}`;
-  console.log(signUpResponse.headers.get("location"));
+  let signUpResponseCookieHeader = `${SESSION_COOKIE}=${cookieObj[SESSION_COOKIE]}`;
   let responseRedirectHome = await fetch(
     signUpResponse.headers.get("location"),
     {
@@ -178,7 +178,7 @@ async function basicRouteTests(port) {
   });
   cookieObj = cookie.parse(responseLogOut.headers.get("set-cookie"));
   assert(
-    cookieObj.hasOwnProperty("_twirl"),
+    cookieObj.hasOwnProperty(SESSION_COOKIE),
     "GET /logout response should not contain value of cookie"
   );
   assert(
