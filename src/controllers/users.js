@@ -42,7 +42,7 @@ export async function createSession(request, response) {
     });
   }
   if (matchPassword(userInDB.password, password)) {
-    response.cookie(SESSION_COOKIE, username, {
+    response.cookie(SESSION_COOKIE, userInDB.id, {
       maxAge: 9000000,
       httpOnly: true,
       signed: true,

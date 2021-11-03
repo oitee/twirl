@@ -66,7 +66,7 @@ async function basicRouteTests(port) {
   // -----------------------------------------------------------------
   // POST /signup
   // -----------------------------------------------------------------
-  let signUpResponse = await fetch(`${baseUrl}/signup`, {
+  const signUpResponse = await fetch(`${baseUrl}/signup`, {
     method: "POST",
     body: parameters,
     redirect: "manual",
@@ -76,14 +76,11 @@ async function basicRouteTests(port) {
     302,
     "POST /signup returns with status 302"
   );
-  let stringCookie = signUpResponse.headers.get("set-cookie");
-  let cookieObj = cookie.parse(stringCookie);
-  let signUpResponseCookieHeader = `${SESSION_COOKIE}=${cookieObj[SESSION_COOKIE]}`;
-  let responseRedirectHome = await fetch(
+  const responseRedirectHome = await fetch(
     signUpResponse.headers.get("location"),
     {
       method: "GET",
-      headers: { Cookie: signUpResponseCookieHeader },
+      headers: extractSessionCookie(signUpResponse),
       redirect: "manual",
     }
   );
@@ -99,12 +96,48 @@ async function basicRouteTests(port) {
   assert(responseRedirectHome.headers.get("set-cookie") == undefined);
 
   // -----------------------------------------------------------------
+  // POST /login (with correct credentials)
+  // -----------------------------------------------------------------
+
+  let logInResponseCorrect = await fetch(`${baseUrl}/login`, {
+    method: "POST",
+    body: parameters,
+    redirect: "manual",
+  });
+  assert.equal(
+    logInResponseCorrect.status,
+    302,
+    "POST /login with existing credentials, returns status 200"
+  );
+
+  let location = logInResponseCorrect.headers.get("location");
+  response = await await fetch(location, {
+    method: "GET",
+    redirect: "manual",
+    headers: extractSessionCookie(logInResponseCorrect),
+  });
+  assert.equal(
+    response.status,
+    200,
+    "GET /home, after redirection from login, returns status 200"
+  );
+  assert(
+    (await response.text()).includes("Welcome, user1"),
+    "GET /home, after redirection from login, body contains username"
+  );
+  assert.equal(
+    response.headers.get("set-cookie"),
+    undefined,
+    "GET /home after redirection from login, contains no set-cookie header"
+  );
+
+  // -----------------------------------------------------------------
   // GET /login with already signed user
   // -----------------------------------------------------------------
 
   let responseLogIn = await fetch(`${baseUrl}/login`, {
     method: "GET",
-    headers: { Cookie: signUpResponseCookieHeader },
+    headers: extractSessionCookie(signUpResponse),
     redirect: "manual",
   });
   assert.equal(
@@ -145,7 +178,7 @@ async function basicRouteTests(port) {
 
   response = await fetch(`${baseUrl}/home`, {
     method: "GET",
-    headers: { Cookie: signUpResponseCookieHeader },
+    headers: extractSessionCookie(signUpResponse),
     redirect: "manual",
   });
   assert.equal(
@@ -162,7 +195,7 @@ async function basicRouteTests(port) {
 
   let responseSignUp = await fetch(`${baseUrl}/signup`, {
     method: "GET",
-    headers: { Cookie: signUpResponseCookieHeader },
+    headers: extractSessionCookie(signUpResponse),
     redirect: "manual",
   });
   assert.equal(
@@ -183,7 +216,7 @@ async function basicRouteTests(port) {
 
   responseSignUp = await fetch(`${baseUrl}/signup`, {
     method: "POST",
-    headers: { Cookie: signUpResponseCookieHeader },
+    headers: extractSessionCookie(signUpResponse),
     redirect: "manual",
   });
   assert(responseSignUp.headers.get("set-cookie") == undefined);
@@ -194,10 +227,10 @@ async function basicRouteTests(port) {
 
   let responseLogOut = await fetch(`${baseUrl}/logout`, {
     method: "GET",
-    headers: { Cookie: signUpResponseCookieHeader },
+    headers: extractSessionCookie(signUpResponse),
     redirect: "manual",
   });
-  cookieObj = cookie.parse(responseLogOut.headers.get("set-cookie"));
+  let cookieObj = cookie.parse(responseLogOut.headers.get("set-cookie"));
   assert(
     cookieObj.hasOwnProperty(SESSION_COOKIE),
     "GET /logout response should not contain value of cookie"
@@ -253,3 +286,10 @@ afterAll(async () => {
 });
 
 test("Basic router tests", () => basicRouteTests(port));
+
+function extractSessionCookie(response) {
+  let stringCookie = response.headers.get("set-cookie");
+  let cookieObj = cookie.parse(stringCookie);
+  let cookieHeader = `${SESSION_COOKIE}=${cookieObj[SESSION_COOKIE]}`;
+  return { Cookie: cookieHeader };
+}
