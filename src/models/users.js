@@ -1,10 +1,10 @@
 import { pool } from "../db/connection.js";
 import { v4 as uuidv4 } from "uuid";
 
-export async function userNameExists(username) {
+export async function validCredentials(username, password) {
   let res = await pool.query(
-    "SELECT username from users where username=$1 limit 1",
-    [username]
+    "SELECT username from users where username=$1 AND password=$2 limit 1",
+    [username, password]
   );
   return res.rows.length > 0;
 }

@@ -1,5 +1,5 @@
 import { SESSION_COOKIE } from "../constants.js";
-import { userNameExists, insertUser } from "../models/users.js";
+import { validCredentials, insertUser } from "../models/users.js";
 
 export function home(request, response) {
   return response.render("home.mustache", {
@@ -13,9 +13,6 @@ export function initiateSignUp(request, response) {
 
 export async function create(request, response) {
   const username = request.body.username;
-  if (await userNameExists(username)) {
-    return response.send("Username already exists");
-  }
   if (await insertUser(username, request.body.password, "normal")) {
     response.cookie(SESSION_COOKIE, username, {
       maxAge: 9000000,
@@ -33,7 +30,9 @@ export function initiateLogIn(request, response) {
 
 export async function createSession(request, response) {
   let username = request.body.username;
-  if (await userNameExists(username)) {
+  let password = request.body.password;
+
+  if (await validCredentials(username, password)) {
     response.cookie(SESSION_COOKIE, username, {
       maxAge: 9000000,
       httpOnly: true,

@@ -120,6 +120,26 @@ async function basicRouteTests(port) {
   assert(responseLogIn.headers.get("set-cookie") == undefined);
 
   // -----------------------------------------------------------------
+  // POST /login with invalid password
+  // -----------------------------------------------------------------
+
+  let invalidParameters = new URLSearchParams();
+  invalidParameters.append("username", "user1");
+  invalidParameters.append("password", "invalid");
+  response = await fetch(`${baseUrl}/login`, {
+    method: "POST",
+    redirect: "manual",
+    body: invalidParameters,
+  });
+  assert.equal(
+    response.status,
+    200,
+    "POST /login (with incorrect password); status should be 200"
+  );
+  assert((await response.text()).includes("Credentials Incorrect"));
+  assert(response.headers.get("set-cookie") == undefined);
+
+  // -----------------------------------------------------------------
   // GET /home with already signed user
   // -----------------------------------------------------------------
 
@@ -223,7 +243,7 @@ beforeAll(async () => {
     created_at TIMESTAMP WITH TIME ZONE,
     role_id INTEGER REFERENCES roles (id));
   INSERT INTO roles (name) values ('admin') , ('normal'), ('superAdmin');`);
-  
+
   port = freePort();
   server = launch(port);
 });
