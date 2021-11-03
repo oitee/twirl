@@ -25,3 +25,17 @@ CREATE TABLE counters(
 INSERT INTO counters (id, value) values ('link_counter', 0);
 UPDATE counters SET value=value+1 WHERE id='link_counter' RETURNING value;
 
+CREATE TABLE links (
+    user_id UUID REFERENCES users (id),
+    original_link TEXT NOT NULL,
+    short_link TEXT NOT NULL,
+    enabled BOOLEAN NOT NULL DEFAULT 'true',
+    accessed_count INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE,
+    updated_at TIMESTAMP WITH TIME ZONE,
+    PRIMARY KEY (user_id, original_link)
+);
+
+
+    
+

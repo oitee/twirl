@@ -18,8 +18,10 @@ async function auth(request, response, next) {
   if (!request.signedCookies[SESSION_COOKIE]) {
     return response.redirect("/login");
   }
-  request.twirlUser = await users.idToUser(request.signedCookies[SESSION_COOKIE]);
-  return next();
+  request.twirlUser = await users.idToUser(
+    request.signedCookies[SESSION_COOKIE]
+  );
+  next();
 }
 
 router.get("/", (request, response) => response.redirect("/home"));
