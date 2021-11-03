@@ -1,10 +1,10 @@
 import { pool } from "../db/connection.js";
 import { v4 as uuidv4 } from "uuid";
 
-export async function fetchUser(username) {
+export async function fetchUser(column, value) {
   let res = await pool.query(
-    "SELECT * from users where username=$1 limit 1",
-    [username]
+    `SELECT * from users where ${column}=$1 limit 1`,
+    [value]
   );
   if(res.rows.length > 0){
     return res.rows[0];
@@ -23,7 +23,7 @@ export async function insertUser(username, password, role) {
                                        values ($1, $2, $3, current_timestamp, $4)`,
       [userID, username, password, roleID]
     );
-    return true;
+    return userID;
   } catch (error) {
     return false;
   } finally {

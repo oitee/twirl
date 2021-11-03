@@ -6,7 +6,7 @@ export default router;
 
 router.use(auth);
 
-function auth(request, response, next) {
+async function auth(request, response, next) {
   if (
     UNAUTHENTICATED_ROUTES.some((routeRegEx) => routeRegEx.exec(request.path))
   ) {
@@ -18,6 +18,7 @@ function auth(request, response, next) {
   if (!request.signedCookies[SESSION_COOKIE]) {
     return response.redirect("/login");
   }
+  request.twirlUser = await users.idToUser(request.signedCookies[SESSION_COOKIE]);
   return next();
 }
 

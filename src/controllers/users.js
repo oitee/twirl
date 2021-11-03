@@ -4,7 +4,8 @@ import crypto from "crypto";
 
 export function home(request, response) {
   return response.render("home.mustache", {
-    username: request.signedCookies[SESSION_COOKIE],
+    
+    username: request.twirlUser.username,
   });
 }
 
@@ -15,8 +16,9 @@ export function initiateSignUp(request, response) {
 export async function create(request, response) {
   const username = request.body.username;
   const password = hashPassword(request.body.password);
-  if (await insertUser(username, password, "normal")) {
-    response.cookie(SESSION_COOKIE, username, {
+  let userID = await insertUser(username, password, "normal");
+  if (userID) {
+    response.cookie(SESSION_COOKIE, userID, {
       maxAge: 9000000,
       httpOnly: true,
       signed: true,
@@ -33,7 +35,7 @@ export function initiateLogIn(request, response) {
 export async function createSession(request, response) {
   let username = request.body.username;
   let password = request.body.password;
-  let userInDB = await fetchUser(username);
+  let userInDB = await fetchUser("username", username);
   if (!userInDB) {
     return response.render("login.mustache", {
       message: "Credentials Incorrect.",
@@ -55,6 +57,10 @@ export async function createSession(request, response) {
 export function endSession(request, response) {
   response.clearCookie(SESSION_COOKIE);
   response.redirect("/login");
+}
+
+export async function idToUser(userID){
+  return await fetchUser("id", userID);
 }
 
 function pbkdf2(password, salt) {
