@@ -1,5 +1,6 @@
 import { SESSION_COOKIE } from "../constants.js";
-import { validCredentials, insertUser } from "../models/users.js";
+import { fetchUser as fetchUser, insertUser } from "../models/users.js";
+import crypto from "crypto";
 
 export function home(request, response) {
   return response.render("home.mustache", {
@@ -13,7 +14,8 @@ export function initiateSignUp(request, response) {
 
 export async function create(request, response) {
   const username = request.body.username;
-  if (await insertUser(username, request.body.password, "normal")) {
+  const password = hashPassword(request.body.password);
+  if (await insertUser(username, password, "normal")) {
     response.cookie(SESSION_COOKIE, username, {
       maxAge: 9000000,
       httpOnly: true,
@@ -31,8 +33,13 @@ export function initiateLogIn(request, response) {
 export async function createSession(request, response) {
   let username = request.body.username;
   let password = request.body.password;
-
-  if (await validCredentials(username, password)) {
+  let userInDB = await fetchUser(username);
+  if (!userInDB) {
+    return response.render("login.mustache", {
+      message: "Credentials Incorrect.",
+    });
+  }
+  if (matchPassword(userInDB.password, password)) {
     response.cookie(SESSION_COOKIE, username, {
       maxAge: 9000000,
       httpOnly: true,
@@ -48,4 +55,21 @@ export async function createSession(request, response) {
 export function endSession(request, response) {
   response.clearCookie(SESSION_COOKIE);
   response.redirect("/login");
+}
+
+function pbkdf2(password, salt) {
+  return crypto
+    .pbkdf2Sync(password, salt, 100, 64, "sha512")
+    .toString("base64");
+}
+
+function hashPassword(password) {
+  const salt = crypto.randomBytes(16).toString("base64");
+  const hashedPassword = pbkdf2(password, salt);
+  return hashedPassword + ":" + salt;
+}
+
+function matchPassword(dbPassword, enteredPassword) {
+  let [hashedPassword, salt] = dbPassword.split(":");
+  return hashedPassword === pbkdf2(enteredPassword, salt);
 }
