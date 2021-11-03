@@ -63,13 +63,13 @@ function pbkdf2(password, salt) {
     .toString("base64");
 }
 
-function hashPassword(password) {
+export function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString("base64");
   const hashedPassword = pbkdf2(password, salt);
   return hashedPassword + ":" + salt;
 }
 
-function matchPassword(dbPassword, enteredPassword) {
+export function matchPassword(dbPassword, enteredPassword) {
   let [hashedPassword, salt] = dbPassword.split(":");
   return hashedPassword === pbkdf2(enteredPassword, salt);
 }
