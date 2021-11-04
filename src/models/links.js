@@ -22,6 +22,17 @@ export async function addShortenedLink(userID, longLink, shortLink) {
   }
 }
 
+export async function fetchShortLink(userID, longLink) {
+  let res = await pool.query(
+    "SELECT short_link from links WHERE original_link=$1 AND user_id=$2 LIMIT 1",
+    [longLink, userID]
+  );
+  if (res.rows.length > 0) {
+    return res.rows[0]["short_link"];
+  }
+  return false;
+}
+
 export async function fetchLongLink(shortLink) {
   let client = await pool.connect();
   try {
@@ -43,4 +54,3 @@ export async function fetchLongLink(shortLink) {
     client.release();
   }
 }
-// return createHash('MD5').update(link).digest("base64").replace(/xyz/g,'1');
