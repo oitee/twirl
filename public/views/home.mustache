@@ -16,6 +16,7 @@
         <input type="text" name="longLink" id="longLinkID">
     </form>
     <div id="responseDiv"></div>
+    <div id="analyticsDiv"></div>
 </body>
 <script>
     async function createLink(event, ...args) {
@@ -24,16 +25,41 @@
         let requestObj = JSON.stringify({ originalLink: value });
         let res = await fetch('/l/shorten', { method: 'POST', headers: { "content-type": "application/json" }, body: requestObj }).then(res => res.json());
         if (res.status) {
-            let finalLink = window.location.protocol + window.location.host + res.shortLink;
-            
             document.getElementById("responseDiv").innerHTML += `
-            <a href='${value}' target='_blank'> ${value}</a> has been shortened to <a href='${res.shortLink}' target='_blank'> ${finalLink}<a/> <br>
+            ${longLinkHref(value)} has been shortened to ${shortLinkHref(res.shortLink)} <br>
             `
         }
         else {
             console.log(`Error`);
         }
 
+    }
+
+    async function analyticsGenerator() {
+        let resTable = await fetch('/analytics', { method: "GET", headers: { "content-type": "application/json" } })
+            .then(res => res.json())
+            .then(res => {
+                return res.data.map(({ original_link, accessed_count, short_link, enabled }) => `
+            <tr>
+            <td>${longLinkHref(original_link)}</td>
+            <td>${shortLinkHref(short_link)}</td>
+            <td>${accessed_count}</td>
+            <td>${enabled}</td>
+                </tr>
+            `).join(' ');
+            });
+        let heading = resTable.length > 0 ? `<h2> Analytics </h2>` : "";
+        document.getElementById("analyticsDiv").innerHTML = `${heading} <table> ${resTable} </table>`
+    };
+    analyticsGenerator();
+    setInterval(analyticsGenerator, 5000);
+
+    function shortLinkHref(link) {
+        let finalLink = window.location.protocol + window.location.host + link;
+        return `<a href='${link}' target='_blank'> ${finalLink}<a/>`;
+    }
+    function longLinkHref(link) {
+        return `<a href='${link}' target='_blank'> ${link.substring(0, 15)}...<a/>`
     }
 </script>
 

@@ -3,8 +3,10 @@ import {
   addShortenedLink,
   fetchLongLink,
   fetchShortLink,
+  fetchAnalytics,
 } from "../models/links.js";
 import { randomBytes } from "crypto";
+import { SESSION_COOKIE } from "../constants.js";
 
 export async function shorten(request, response) {
   let inputLink = request.body.originalLink;
@@ -44,4 +46,11 @@ export async function expandLink(link) {
     return { longLink, status: true };
   }
   return { status: false };
+}
+
+export async function analytics(request, response) {
+  let data = await fetchAnalytics(request.twirlUser.id);
+  data.map((row) => (row.short_link = "/l/" + row.short_link));
+
+  return response.send({ data: data });
 }

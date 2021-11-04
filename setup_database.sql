@@ -35,9 +35,3 @@ CREATE TABLE links (
     updated_at TIMESTAMP WITH TIME ZONE,
     PRIMARY KEY (user_id, original_link)
 );
-
-
-    
-
----SELECT * FROM links WHERE user_id='1bc72710-159a-44ee-914f-5354afc258f2' AND enabled='t' ORDER BY accessed_count DESC, created_at DESC limit 50;
-

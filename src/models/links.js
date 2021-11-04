@@ -54,3 +54,13 @@ export async function fetchLongLink(shortLink) {
     client.release();
   }
 }
+
+export async function fetchAnalytics(userID) {
+  let res = await pool.query(
+    `SELECT original_link, short_link, accessed_count, enabled FROM links 
+  WHERE user_id=$1 
+  ORDER BY accessed_count DESC, created_at DESC limit 50;`,
+    [userID]
+  );
+  return res.rows;
+}
