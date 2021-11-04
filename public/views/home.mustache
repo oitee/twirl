@@ -10,13 +10,13 @@
 
 <body>
     <h1>Home</h1>
-    Welcome, {{ username }}
-    <a href="/logout"> Log Out </a>
+    Welcome, {{ username }} <br>
     <form onsubmit="createLink(event)"> Input
         <input type="text" name="longLink" id="longLinkID">
     </form>
     <div id="responseDiv"></div>
-    <div id="analyticsDiv"></div>
+    <div id="analyticsDiv"></div><br>
+    <a href="/logout"> Log Out </a>
 </body>
 <script>
     async function createLink(event, ...args) {
@@ -41,15 +41,21 @@
             .then(res => {
                 return res.data.map(({ original_link, accessed_count, short_link, enabled }) => `
             <tr>
-            <td>${longLinkHref(original_link)}</td>
-            <td>${shortLinkHref(short_link)}</td>
-            <td>${accessed_count}</td>
-            <td>${enabled}</td>
+            <td style="text-align:center" bgcolor="#e5e5e5">${longLinkHref(original_link)} &nbsp;</td>
+            <td style="text-align:center" bgcolor="#b2b2b2">${shortLinkHref(short_link)} &nbsp;</td>
+            <td style="text-align:center" bgcolor="#e5e5e5">${accessed_count}</td>
+            <td style="text-align:center" bgcolor="#b2b2b2">${enabled}</td>
                 </tr>
             `).join(' ');
             });
         let heading = resTable.length > 0 ? `<h2> Analytics </h2>` : "";
-        document.getElementById("analyticsDiv").innerHTML = `${heading} <table> ${resTable} </table>`
+        let headerRow = `<tr>
+            <th bgcolor="#e5e5e5">Original Link</th>
+            <th bgcolor="#b2b2b2">Short Link &nbsp;</th>
+            <th bgcolor="#e5e5e5">Acccesed Count &nbsp;</th>
+            <th bgcolor="#b2b2b2">Enabled &nbsp;</th>
+                </tr>`;
+        document.getElementById("analyticsDiv").innerHTML = `${heading} <table> ${headerRow} ${resTable} </table>`
     };
     analyticsGenerator();
     setInterval(analyticsGenerator, 5000);
@@ -59,7 +65,11 @@
         return `<a href='${link}' target='_blank'> ${finalLink}<a/>`;
     }
     function longLinkHref(link) {
-        return `<a href='${link}' target='_blank'> ${link.substring(0, 15)}...<a/>`
+        let truncatedLink = link;
+        if(link.length > 35){
+            truncatedLink = link.substring(0, 32) + '...';
+        }
+        return `<a href='${link}' target='_blank'> ${truncatedLink}<a/>`
     }
 </script>
 
