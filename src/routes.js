@@ -1,5 +1,6 @@
 import express from "express";
 import * as users from "./controllers/users.js";
+import * as links from "./controllers/links.js";
 import { UNAUTHENTICATED_ROUTES, SESSION_COOKIE } from "./constants.js";
 let router = express.Router();
 export default router;
@@ -25,6 +26,8 @@ async function auth(request, response, next) {
 }
 
 router.get("/", (request, response) => response.redirect("/home"));
+
+router.post("/l/shorten", links.shorten);
 
 router.get("/home", users.home);
 

@@ -1,14 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Twirl | Home</title>
 </head>
+
 <body>
     <h1>Home</h1>
     Welcome, {{ username }}
     <a href="/logout"> Log Out </a>
+    <form onsubmit="createLink(event)"> Input
+        <input type="text" name="longLink" id="longLinkID">
+    </form>
+    <div id="responseDiv"></div>
 </body>
+<script>
+    async function createLink(event, ...args) {
+        event.preventDefault();
+        let value = document.getElementById("longLinkID").value;
+        let requestObj = JSON.stringify({ originalLink: value });
+        let res = await fetch('/l/shorten', { method: 'POST', headers: { "content-type": "application/json" }, body: requestObj }).then(res => res.json());
+        if (res.status) {
+            let finalLink = window.location.protocol + window.location.host + '/' + res.shortLink;
+            console.log(`Your shortened link : ${res.shortLink}`);
+            document.getElementById("responseDiv").innerHTML += `
+            <a href='${value}'> ${value}</a> has been shortened to <a href='${res.shortLink}'> ${finalLink}<a/> <br>
+            `
+        }
+        else {
+            console.log(`Error`);
+        }
+
+    }
+</script>
+
 </html>

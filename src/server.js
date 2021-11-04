@@ -1,4 +1,4 @@
-import express, { urlencoded } from "express";
+import express, { urlencoded, json } from "express";
 import cookieParser from "cookie-parser";
 import path from "path";
 import mustacheExpress from "mustache-express";
@@ -14,6 +14,7 @@ export default function launch(port) {
   app.set("views", __dirname + "/../public/views");
 
   app.use(urlencoded({ extended: true }));
+  app.use(json());
   app.use(cookieParser(COOKIE_SECRET));
   app.use(cookieEncrypter(COOKIE_SECRET));
 

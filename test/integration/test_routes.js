@@ -258,6 +258,39 @@ async function basicRouteTests(port) {
     "POST /signup with already existing username; status should be 200"
   );
   assert(responseLogIn.headers.get("set-cookie") == undefined);
+
+  // -----------------------------------------------------------------
+  // POST /l/shorten WITHOUT LOG-IN
+  // -----------------------------------------------------------------
+  let link4 = "https://stackoverflow.com/";
+
+  let res = await fetch(`${baseUrl}/l/shorten`, {
+    method: "POST",
+    redirect: "manual",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ originalLink: link4 }),
+  });
+  assert.equal(res.status, 302, "User cannot create link without signing in");
+  assert(res.headers.get("set-cookie") == undefined);
+  // -----------------------------------------------------------------
+  // POST /l/shorten WITH LOGGED IN USER
+  // -----------------------------------------------------------------
+
+  res = await fetch(`${baseUrl}/l/shorten`, {
+    method: "POST",
+    redirect: "manual",
+    headers: {
+      "content-type": "application/json",
+      ...extractSessionCookie(signUpResponse),
+    },
+    body: JSON.stringify({ originalLink: link4 }),
+  });
+  assert(
+    (await res.json()).status,
+    "Link should be successfully shortened for a logged-in user"
+  );
+  assert.equal(res.status, 200, "Logged-in user can create link");
+  assert(res.headers.get("set-cookie") == undefined);
 }
 let port;
 let server;

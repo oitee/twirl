@@ -6,6 +6,12 @@ import {
 } from "../models/links.js";
 import { randomBytes } from "crypto";
 
+export async function shorten(request, response){
+  let inputLink = request.body.originalLink;
+  let shortLink = await shortenLink(request.twirlUser.id, inputLink);
+  return response.send(shortLink);
+}
+
 export async function shortenLink(userID, link) {
   let counter = await incrementCounter();
   let shortLink = randomBytes(2).toString("base64") + counter.toString(36);
