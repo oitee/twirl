@@ -22,19 +22,19 @@ export async function addShortenedLink(userID, longLink, shortLink) {
   }
 }
 
-export async function fetchLongLink(userID, shortLink) {
+export async function fetchLongLink(shortLink) {
   let client = await pool.connect();
   try {
     let res = await client.query(
       `SELECT original_link FROM links 
-      WHERE short_link=$1 AND enabled='t' AND user_id=$2 LIMIT 1`,
-      [shortLink, userID]
+      WHERE short_link=$1 AND enabled='t' LIMIT 1`,
+      [shortLink]
     );
     if (res.rows.length > 0) {
       await client.query(
         `UPDATE links SET accessed_count=accessed_count+1 
-        where short_link=$1 AND enabled='t' AND user_id=$2`,
-        [shortLink, userID]
+        where short_link=$1 AND enabled='t'`,
+        [shortLink]
       );
       return res.rows[0]["original_link"];
     }

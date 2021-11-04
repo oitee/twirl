@@ -18,8 +18,8 @@ export async function shortenLink(userID, link) {
   return { shortLink, status };
 }
 
-export async function expandLink(userID, link) {
-  let longLink = await fetchLongLink(userID, link);
+export async function expandLink(link) {
+  let longLink = await fetchLongLink(link);
   if (longLink) {
     return { longLink, status: true };
   }
