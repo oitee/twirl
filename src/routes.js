@@ -17,6 +17,7 @@ async function auth(request, response, next) {
   request.twirlUser = await users.idToUser(
     request.signedCookies[SESSION_COOKIE]
   );
+  delete request.twirlUser.password;
   next();
 }
 
