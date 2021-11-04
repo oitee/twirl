@@ -1,9 +1,18 @@
 import pathToReg from "path-to-regexp";
 
-const baseRouts = ["/signup", "/login"];
-export const UNAUTHENTICATED_ROUTES = baseRouts.map((route) =>
-  pathToReg(route)
-);
+const baseRoutes = [
+  ["ANY", "/signup"],
+  ["ANY", "/login"],
+  ["GET", "/l/:id"],
+];
+export const UNAUTHENTICATED_ROUTE_MATCHERS = baseRoutes.map(([method, route]) => {
+  let reg = pathToReg(route);
+  return (request) => {
+    if (!reg.exec(request.path)) return false;
+    if (method === "ANY") return true;
+    return request.method === method;
+  };
+});
 
 export const SESSION_COOKIE = "_twirl";
 export const PG_CONNECTION_STRING = process.env.PG_CONNECTION_STRING;

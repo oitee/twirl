@@ -4,16 +4,26 @@ import crypto from "crypto";
 
 export function home(request, response) {
   return response.render("home.mustache", {
-    
     username: request.twirlUser.username,
   });
 }
 
 export function initiateSignUp(request, response) {
+  if (homeIfSessionExists(request, response)) {
+    return;
+  }
   return response.render("signup.mustache", { message: "Please sign up" });
 }
 
 export async function create(request, response) {
+  if (homeIfSessionExists(request, response)) {
+    return;
+  }
+
+  if (request.signedCookies[SESSION_COOKIE]) {
+    return response.redirect("/home");
+  }
+
   const username = request.body.username;
   const password = hashPassword(request.body.password);
   let userID = await insertUser(username, password, "normal");
@@ -29,10 +39,16 @@ export async function create(request, response) {
 }
 
 export function initiateLogIn(request, response) {
+  if (homeIfSessionExists(request, response)) {
+    return;
+  }
   return response.render("login.mustache", {});
 }
 
 export async function createSession(request, response) {
+  if (homeIfSessionExists(request, response)) {
+    return;
+  }
   let username = request.body.username;
   let password = request.body.password;
   let userInDB = await fetchUser("username", username);
@@ -59,7 +75,7 @@ export function endSession(request, response) {
   response.redirect("/login");
 }
 
-export async function idToUser(userID){
+export async function idToUser(userID) {
   return await fetchUser("id", userID);
 }
 
@@ -78,4 +94,12 @@ export function hashPassword(password) {
 export function matchPassword(dbPassword, enteredPassword) {
   let [hashedPassword, salt] = dbPassword.split(":");
   return hashedPassword === pbkdf2(enteredPassword, salt);
+}
+
+function homeIfSessionExists(request, response) {
+  if (request.signedCookies[SESSION_COOKIE]) {
+    response.redirect("/home");
+    return true;
+  }
+  return false;
 }

@@ -273,7 +273,7 @@ async function basicRouteTests(port) {
   assert.equal(res.status, 302, "User cannot create link without signing in");
   assert(res.headers.get("set-cookie") == undefined);
   // -----------------------------------------------------------------
-  // POST /l/shorten WITH LOGGED IN USER
+  // POST /l/shortLink WITH LOGGED IN USER
   // -----------------------------------------------------------------
 
   res = await fetch(`${baseUrl}/l/shorten`, {
@@ -285,12 +285,54 @@ async function basicRouteTests(port) {
     },
     body: JSON.stringify({ originalLink: link4 }),
   });
+  let resBody = await res.json();
   assert(
-    (await res.json()).status,
+    resBody.status,
     "Link should be successfully shortened for a logged-in user"
   );
   assert.equal(res.status, 200, "Logged-in user can create link");
   assert(res.headers.get("set-cookie") == undefined);
+
+  // -----------------------------------------------------------------
+  // GET /l/shortLink WITH NO SESSION
+  // -----------------------------------------------------------------
+
+  let expansionRes = await fetch(`${baseUrl}${resBody.shortLink}`, {
+    method: "GET",
+    redirect: "manual",
+  });
+
+  assert.equal(
+    expansionRes.status,
+    302,
+    "Valid shortened link should be redirected"
+  );
+  assert.equal(
+    expansionRes.headers.get("location"),
+    link4,
+    "Check if the expanded link is correct, when there is no session"
+  );
+
+  // -----------------------------------------------------------------
+  // GET /l/shortLink WITH SESSION
+  // -----------------------------------------------------------------
+
+  expansionRes = await fetch(`${baseUrl}${resBody.shortLink}`, {
+    method: "GET",
+    redirect: "manual",
+    headers: extractSessionCookie(signUpResponse),
+  });
+
+  assert.equal(
+    expansionRes.status,
+    302,
+    "Valid shortened link should be redirected"
+  );
+  assert.equal(
+    expansionRes.headers.get("location"),
+    link4,
+    "Check if the expanded link is correct, when there is a session"
+  );
 }
 let port;
 let server;

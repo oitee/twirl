@@ -24,10 +24,10 @@
         let requestObj = JSON.stringify({ originalLink: value });
         let res = await fetch('/l/shorten', { method: 'POST', headers: { "content-type": "application/json" }, body: requestObj }).then(res => res.json());
         if (res.status) {
-            let finalLink = window.location.protocol + window.location.host + '/' + res.shortLink;
-            console.log(`Your shortened link : ${res.shortLink}`);
+            let finalLink = window.location.protocol + window.location.host + res.shortLink;
+            
             document.getElementById("responseDiv").innerHTML += `
-            <a href='${value}'> ${value}</a> has been shortened to <a href='${res.shortLink}'> ${finalLink}<a/> <br>
+            <a href='${value}' target='_blank'> ${value}</a> has been shortened to <a href='${res.shortLink}' target='_blank'> ${finalLink}<a/> <br>
             `
         }
         else {

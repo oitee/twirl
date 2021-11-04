@@ -6,17 +6,27 @@ import {
 } from "../models/links.js";
 import { randomBytes } from "crypto";
 
-export async function shorten(request, response){
+export async function shorten(request, response) {
   let inputLink = request.body.originalLink;
   let shortLink = await shortenLink(request.twirlUser.id, inputLink);
+  shortLink.shortLink = "/l/" + shortLink.shortLink;
   return response.send(shortLink);
+}
+
+export async function goToLink(request, response) {
+  let inputLink = request.params.id;
+  let outputLink = await expandLink(inputLink);
+  if (outputLink.status) {
+    return response.redirect(outputLink.longLink);
+  }
+  return response.status(404).send(`This is not a valid page`);
 }
 
 export async function shortenLink(userID, link) {
   let counter = await incrementCounter();
   let shortLink = randomBytes(2).toString("base64") + counter.toString(36);
   shortLink = shortLink.replace(/[\-+\/=]/g, "");
-  
+
   let status = await addShortenedLink(userID, link, shortLink);
   if (status) {
     return { shortLink, status };
