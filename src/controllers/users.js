@@ -42,7 +42,7 @@ export function initiateLogIn(request, response) {
   if (homeIfSessionExists(request, response)) {
     return;
   }
-  return response.render("login.mustache", {});
+  return response.render("login.mustache", {message: "Please Log In"});
 }
 
 export async function createSession(request, response) {
@@ -54,7 +54,7 @@ export async function createSession(request, response) {
   let userInDB = await fetchUser("username", username);
   if (!userInDB) {
     return response.render("login.mustache", {
-      message: "Credentials Incorrect.",
+      message: "Credentials Incorrect",
     });
   }
   if (matchPassword(userInDB.password, password)) {
