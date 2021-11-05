@@ -35,7 +35,7 @@ export async function create(request, response) {
     });
     return response.redirect("/home");
   }
-  return response.send("Username already exists");
+  return response.render("signup.mustache", { message: "Username already exists" });
 }
 
 export function initiateLogIn(request, response) {
