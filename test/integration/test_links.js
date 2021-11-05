@@ -1,6 +1,10 @@
 import assert from "assert";
 import { insertUser } from "../../src/models/users.js";
-import { shortenLink, expandLink } from "../../src/controllers/links.js";
+import {
+  shortenLink,
+  expandLink,
+  analytics,
+} from "../../src/controllers/links.js";
 import { pool, poolStart } from "../../src/db/connection.js";
 
 /*
@@ -15,6 +19,46 @@ import { pool, poolStart } from "../../src/db/connection.js";
   Check that user 1 can shorten link2 with count zero
   Expand short link1 and short link2
 */
+
+async function testAnalytics() {
+  let alice = await insertUser("Alice", "testPassword", "normal");
+  let link1 = "https://otee.dev/2021/11/03/diwali-hack-week.html";
+  let link2 = "https://github.com/oitee";
+  let link3 = "https://google.com";
+  let shortLink1Alice = await shortenLink(alice, link1);
+  let shortLink3Alice = await shortenLink(alice, link3);
+
+  for (let i = 0; i < 10; i++) {
+    await expandLink(shortLink3Alice.shortLink);
+  }
+ 
+
+
+  // The idea, here, is to shorten link2 last.
+  // SetTimeout does not return a promise
+  // Promise constructor accepts a call back function
+  // this call-back fn expects two functions, res and rej
+  // the invocation of the res fn, implies completion (or resulution) of the promise
+  // this is why, we pass the result of shortening to res, which is inside setTimeout
+  
+  
+  await new Promise((resolve, reject) =>
+    setTimeout(() => resolve(shortenLink(alice, link2)), 100)
+  );
+
+  let mockReq = { twirlUser: { id: alice } };
+  let analyticsResult;
+  let mockRes = {send : (object) => analyticsResult = object.data};
+
+  await analytics(mockReq, mockRes);
+  
+  assert.equal(analyticsResult[0]["original_link"], link3);
+  assert.equal(analyticsResult[1]["original_link"], link2);
+  assert.equal(analyticsResult[2]["original_link"], link1);
+  assert.equal(analyticsResult[0]["accessed_count"], 10);
+  assert.equal(analyticsResult[1]["accessed_count"], 0);
+  assert.equal(analyticsResult[2]["accessed_count"], 0);
+}
 
 async function testLinkShortening() {
   let alice = await insertUser("Alice", "testPassword", "normal");
@@ -168,6 +212,7 @@ afterAll(async () => {
 });
 
 await test("Test shortening and expansion of links", testLinkShortening);
+await test("Analytics test", testAnalytics);
 
 async function validateAccessedCount(shortLink, expectedCount, userID) {
   let res = await pool.query(
