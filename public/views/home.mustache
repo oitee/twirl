@@ -44,7 +44,8 @@
             <td style="text-align:center" bgcolor="#e5e5e5">${longLinkHref(original_link)} &nbsp;</td>
             <td style="text-align:center" bgcolor="#b2b2b2">${shortLinkHref(short_link)} &nbsp;</td>
             <td style="text-align:center" bgcolor="#e5e5e5">${accessed_count}</td>
-            <td style="text-align:center" bgcolor="#b2b2b2">${enabled}</td>
+            <td style="text-align:center" bgcolor="#b2b2b2"> ${enabled ? "Live" : "Disabled"} &nbsp&nbsp
+                <a href="#" onclick="return updateStatus('${short_link}', ${enabled})">Click to toggle</a></td>
                 </tr>
             `).join(' ');
             });
@@ -53,12 +54,12 @@
             <th bgcolor="#e5e5e5">Original Link</th>
             <th bgcolor="#b2b2b2">Short Link &nbsp;</th>
             <th bgcolor="#e5e5e5">Acccesed Count &nbsp;</th>
-            <th bgcolor="#b2b2b2">Enabled &nbsp;</th>
+            <th bgcolor="#b2b2b2">Action &nbsp;</th>
                 </tr>`;
         document.getElementById("analyticsDiv").innerHTML = `${heading} <table> ${headerRow} ${resTable} </table>`
     };
     analyticsGenerator();
-    setInterval(analyticsGenerator, 5000);
+    setInterval(analyticsGenerator, 1000);
 
     function shortLinkHref(link) {
         let finalLink = window.location.protocol + window.location.host + link;
@@ -66,11 +67,21 @@
     }
     function longLinkHref(link) {
         let truncatedLink = link;
-        if(link.length > 35){
+        if (link.length > 35) {
             truncatedLink = link.substring(0, 32) + '...';
         }
         return `<a href='${link}' target='_blank'> ${truncatedLink}<a/>`
     }
+    async function updateStatus(link, currentStatus) {
+        link = link.substring(3);
+        if (currentStatus) {
+            await fetch(`/l/disable/${link}`, { method: "GET" });
+        }
+        else {
+            await fetch(`/l/enable/${link}`, { method: "GET" });
+        }
+    }
+
 </script>
 
 </html>
