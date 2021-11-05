@@ -6,6 +6,8 @@ import cookie from "cookie";
 import { SESSION_COOKIE } from "../../src/constants.js";
 import { pool } from "../../src/db/connection.js";
 
+let port, server, baseUrl;
+
 function freePort() {
   const testApp = express();
   const testServer = testApp.listen(0);
@@ -15,7 +17,6 @@ function freePort() {
 }
 
 async function basicRouteTests(port) {
-  let baseUrl = `http://localhost:${port}`;
   let response;
   // -----------------------------------------------------------------
   // GET /
@@ -262,21 +263,27 @@ async function basicRouteTests(port) {
   // -----------------------------------------------------------------
   // POST /l/shorten WITHOUT LOG-IN
   // -----------------------------------------------------------------
-  let link4 = "https://stackoverflow.com/";
 
-  let res = await fetch(`${baseUrl}/l/shorten`, {
-    method: "POST",
-    redirect: "manual",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ originalLink: link4 }),
-  });
-  assert.equal(res.status, 302, "User cannot create link without signing in");
-  assert(res.headers.get("set-cookie") == undefined);
+  let link4 = "https://stackoverflow.com/";
+  await assertNoAccessWithoutSession(
+    "POST",
+    "/l/shorten",
+    { "content-type": "application/json" },
+    JSON.stringify({ originalLink: link4 })
+  );
+  // let res = await fetch(`${baseUrl}/l/shorten`, {
+  //   method: "POST",
+  //   redirect: "manual",
+  //   headers: { "content-type": "application/json" },
+  //   body: JSON.stringify({ originalLink: link4 }),
+  // });
+  // assert.equal(res.status, 302, "User cannot create link without signing in");
+  // assert(res.headers.get("set-cookie") == undefined);
   // -----------------------------------------------------------------
   // POST /l/shortLink WITH LOGGED IN USER
   // -----------------------------------------------------------------
 
-  res = await fetch(`${baseUrl}/l/shorten`, {
+  let res = await fetch(`${baseUrl}/l/shorten`, {
     method: "POST",
     redirect: "manual",
     headers: {
@@ -333,9 +340,15 @@ async function basicRouteTests(port) {
     link4,
     "Check if the expanded link is correct, when there is a session"
   );
+
+  // -----------------------------------------------------------------
+  // GET /analytics WITHOUT SESSION
+  // -----------------------------------------------------------------
+    
+  await assertNoAccessWithoutSession("GET", "/analytics"); 
+
 }
-let port;
-let server;
+
 
 beforeAll(async () => {
   await pool.query(`
@@ -373,6 +386,7 @@ beforeAll(async () => {
 
   port = freePort();
   server = launch(port);
+  baseUrl = `http://localhost:${port}`;
 });
 afterAll(async () => {
   server.close();
@@ -386,4 +400,21 @@ function extractSessionCookie(response) {
   let cookieObj = cookie.parse(stringCookie);
   let cookieHeader = `${SESSION_COOKIE}=${cookieObj[SESSION_COOKIE]}`;
   return { Cookie: cookieHeader };
+}
+
+async function assertNoAccessWithoutSession(method, path, extraHeaders, body) {
+  let requestObject = {
+    method: method,
+    redirect: "manual",
+  };
+  if (extraHeaders) {
+    requestObject.headers = extraHeaders;
+  }
+  if (body) {
+    requestObject.body = body;
+  }
+
+  let res = await fetch(`${baseUrl}${path}`, requestObject);
+  assert.equal(res.status, 302, `User cannot accesss ${path} without session`);
+  assert(res.headers.get("set-cookie") == undefined);
 }
