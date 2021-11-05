@@ -4,8 +4,8 @@
   "description": "",
   "main": "",
   "scripts": {
-    "test": "COOKIE_SECRET=eiffeltowerdelhiindia12345678900 PG_CONNECTION_STRING=postgres://postgres@localhost:5432/twirl_test NODE_OPTIONS=--experimental-vm-modules jest --coverage=true -i",
-    "start_local": "COOKIE_SECRET=eiffeltowerdelhiindia12345678900 PG_CONNECTION_STRING=postgres://postgres@localhost:5432/twirl  nodemon $1",
+    "test": "PORT=4001 COOKIE_SECRET=eiffeltowerdelhiindia12345678900 PG_CONNECTION_STRING=postgres://postgres@localhost:5432/twirl_test NODE_OPTIONS=--experimental-vm-modules jest --coverage=true -i",
+    "start_local": "PORT=4001 COOKIE_SECRET=eiffeltowerdelhiindia12345678900 PG_CONNECTION_STRING=postgres://postgres@localhost:5432/twirl  nodemon $1",
     "start": "node app.js",
     "github_test": "NODE_OPTIONS=--experimental-vm-modules jest --coverage=true -i"
   },

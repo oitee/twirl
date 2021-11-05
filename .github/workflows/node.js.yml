@@ -53,3 +53,4 @@ jobs:
       env:
         COOKIE_SECRET: eiffeltowerdelhiindia12345678900 
         PG_CONNECTION_STRING: 'postgres://postgres:otee@localhost:5432/twirl_test'
+        PORT: 4001
