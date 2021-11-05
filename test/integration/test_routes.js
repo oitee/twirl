@@ -4,7 +4,7 @@ import express from "express";
 import fetch from "node-fetch";
 import cookie from "cookie";
 import { SESSION_COOKIE } from "../../src/constants.js";
-import { pool } from "../../src/db/connection.js";
+import { pool, poolStart } from "../../src/db/connection.js";
 
 let port, server, baseUrl;
 
@@ -344,13 +344,12 @@ async function basicRouteTests(port) {
   // -----------------------------------------------------------------
   // GET /analytics WITHOUT SESSION
   // -----------------------------------------------------------------
-    
-  await assertNoAccessWithoutSession("GET", "/analytics"); 
 
+  await assertNoAccessWithoutSession("GET", "/analytics");
 }
 
-
 beforeAll(async () => {
+  poolStart();
   await pool.query(`
   DROP TABLE IF EXISTS counters;
   DROP TABLE IF EXISTS links;

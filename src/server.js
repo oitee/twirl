@@ -5,6 +5,7 @@ import mustacheExpress from "mustache-express";
 import router from "./routes.js";
 import { COOKIE_SECRET } from "./constants.js";
 import cookieEncrypter from "cookie-encrypter";
+import { poolStart } from "./db/connection.js";
 
 export default function launch(port) {
   const __dirname = path.dirname(new URL(import.meta.url).pathname);
@@ -19,5 +20,6 @@ export default function launch(port) {
   app.use(cookieEncrypter(COOKIE_SECRET));
 
   app.use(router);
+  poolStart();
   return app.listen(port, () => console.log(`Twirl listenning on ${port}...`));
 }

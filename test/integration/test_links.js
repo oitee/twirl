@@ -1,7 +1,7 @@
 import assert from "assert";
 import { insertUser } from "../../src/models/users.js";
 import { shortenLink, expandLink } from "../../src/controllers/links.js";
-import { pool } from "../../src/db/connection.js";
+import { pool, poolStart } from "../../src/db/connection.js";
 
 /*
   Create two users
@@ -128,7 +128,8 @@ async function testLinkShortening() {
   await validateAccessedCount(shortLink3AliceFirst.shortLink, 0, alice);
 }
 
-beforeAll(async () => {
+beforeEach(async () => {
+  poolStart();
   await pool.query(`
   DROP TABLE IF EXISTS counters;
   DROP TABLE IF EXISTS links;

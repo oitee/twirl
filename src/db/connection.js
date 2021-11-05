@@ -10,4 +10,10 @@ let config = {
 if (PG_SSL_CONNECTION) {
   config.ssl = { rejectUnauthorized: false };
 }
-export const pool = new Pool(config);
+export let pool;
+
+export function poolStart() {
+  if (!pool || pool.ended) {
+    pool = new Pool(config);
+  }
+}
