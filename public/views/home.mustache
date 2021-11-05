@@ -5,18 +5,65 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <title>Twirl | Home</title>
 </head>
 
 <body>
-    <h1>Home</h1>
-    Welcome, {{ username }} <br>
-    <form onsubmit="createLink(event)"> Input
-        <input type="text" name="longLink" id="longLinkID">
-    </form>
-    <div id="responseDiv"></div>
-    <div id="analyticsDiv"></div><br>
-    <a href="/logout"> Log Out </a>
+    <div class="container">
+        <header class="navbar navbar-expand flex-column flex-md-row bd-navbar">
+            <a class="navbar-brand mr-0 mr-md-2" href="/" aria-label="Bootstrap"> Twirl
+            </a>
+            <div class="navbar-nav-scroll">
+                <ul class="navbar-nav bd-navbar-nav flex-row">
+                    <li class="nav-item">
+                        <a class="nav-link " href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link " href="/logout">Logout</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://otee.dev" target="_blank" rel="noopener">Blog</a>
+                    </li>
+                </ul>
+            </div>
+            <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
+            </ul>
+            <a class="btn btn-bd-download d-none d-lg-inline-block mb-3 mb-md-0 ml-md-3"
+                href="https://twitter.com/otee.codes">@Otee</a>
+        </header>
+        <div class="row pt-md-5 pb-md-5 bg-light">
+            <div class="col-sm-2"> </div>
+            <div class="col-sm-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Twirl Link Shortener</h5>
+                        <h6 class="card-subtitle mb-2 text-muted" id="responseDiv">Click to see the magic!</h6>
+                        <form onsubmit="createLink(event)">
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="longLink" id="longLinkID"
+                                    placeholder="Enter Link">
+                            </div>
+                            <div class="d-flex justify-content-center">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-2"> </div>
+        </div>
+        <div class="row pt-md-5 pb-md-5">
+            <div class="col-sm-12">
+                <div id="responseDiv"></div>
+                <div id="analyticsDiv" class="table-responsive">
+                    <h2> Analytics</h2>
+                </div><br>
+            </div>
+        </div>
+    </div>
+
 </body>
 <script>
     async function createLink(event, ...args) {
@@ -42,22 +89,22 @@
             .then(res => {
                 return res.data.map(({ original_link, accessed_count, short_link, enabled }) => `
             <tr>
-            <td style="text-align:center" bgcolor="#e5e5e5">${longLinkHref(original_link)} &nbsp;</td>
-            <td style="text-align:center" bgcolor="#b2b2b2">${shortLinkHref(short_link)} &nbsp;</td>
-            <td style="text-align:center" bgcolor="#e5e5e5">${accessed_count}</td>
-            <td style="text-align:center" bgcolor="#b2b2b2"> ${enabled ? "Live" : "Disabled"} &nbsp&nbsp
-                <a href="#" onclick="return updateStatus('${short_link}', ${enabled})">Click to toggle</a></td>
+            <td style="text-align:center">${longLinkHref(original_link)} &nbsp;</td>
+            <td style="text-align:center">${shortLinkHref(short_link)} &nbsp;</td>
+            <td style="text-align:center">${accessed_count}</td>
+            <td style="text-align:center"> ${enabled ? "Live" : "Disabled"} &nbsp&nbsp
+                <a href="#" onclick="return updateStatus('${short_link}', ${enabled})">Toggle</a></td>
                 </tr>
             `).join(' ');
             });
         let heading = resTable.length > 0 ? `<h2> Analytics </h2>` : "";
         let headerRow = `<tr>
-            <th bgcolor="#e5e5e5">Original Link</th>
-            <th bgcolor="#b2b2b2">Short Link &nbsp;</th>
-            <th bgcolor="#e5e5e5">Acccesed Count &nbsp;</th>
-            <th bgcolor="#b2b2b2">Action &nbsp;</th>
+            <th style="text-align:center" scope="col">Original Link</th>
+            <th style="text-align:center" scope="col">Short Link &nbsp;</th>
+            <th style="text-align:center" scope="col">Acccesed Count &nbsp;</th>
+            <th style="text-align:center" scope="col">Action &nbsp;</th>
                 </tr>`;
-        document.getElementById("analyticsDiv").innerHTML = `${heading} <table> ${headerRow} ${resTable} </table>`
+        document.getElementById("analyticsDiv").innerHTML = `${heading} <table class="table table-striped"> ${headerRow} ${resTable} </table>`
     };
     analyticsGenerator();
     setInterval(analyticsGenerator, 1000);
