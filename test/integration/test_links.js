@@ -6,6 +6,7 @@ import {
   analytics,
   disableLink,
   enableLink,
+  shorten
 } from "../../src/controllers/links.js";
 import { pool, poolStart } from "../../src/db/connection.js";
 
@@ -59,9 +60,9 @@ async function testAnalytics() {
   assert.equal(analyticsResult[2]["accessed_count"], 0);
 
   //----------------------------------------------------------------
-  // ENABLE/DISABLE LINKS 
+  // ENABLE/DISABLE LINKS
   //----------------------------------------------------------------
-  
+
   let updateStatus;
 
   let mockReq2 = { params: { id: shortLink3Alice.shortLink } };
@@ -91,6 +92,18 @@ async function testAnalytics() {
   mockReq2.params.id = "abcd1??";
   await enableLink(mockReq2, mockRes2);
   assert(!updateStatus, "Status for enabling invalid link should be false");
+}
+
+async function testInvalidUrlShortening() {
+  //----------------------------------------------------------------
+  // SHORTEN INVALID URL
+  //----------------------------------------------------------------
+  let alice = await insertUser("Alice", "testPassword", "normal");
+  let linkCreationResult = 1;
+  let mockReq3 = { body: { originalLink: "1234" }, twirlUser: { id: alice } };
+  let mockRes3 = { send: (object) => (linkCreationResult = object.status) };
+  await shorten(mockReq3, mockRes3);
+  assert(!linkCreationResult, "Invalid URLs should not be shortened");
 }
 
 async function testLinkShortening() {
@@ -246,6 +259,7 @@ afterAll(async () => {
 
 await test("Test shortening and expansion of links", testLinkShortening);
 await test("Analytics test", testAnalytics);
+await test("Invalid URL test", testInvalidUrlShortening);
 
 async function validateAccessedCount(shortLink, expectedCount, userID) {
   let res = await pool.query(

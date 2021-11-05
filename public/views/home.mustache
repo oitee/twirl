@@ -25,12 +25,13 @@
         let requestObj = JSON.stringify({ originalLink: value });
         let res = await fetch('/l/shorten', { method: 'POST', headers: { "content-type": "application/json" }, body: requestObj }).then(res => res.json());
         if (res.status) {
-            document.getElementById("responseDiv").innerHTML += `
+            document.getElementById("responseDiv").innerHTML = `
             ${longLinkHref(value)} has been shortened to ${shortLinkHref(res.shortLink)} <br>
             `
         }
         else {
-            console.log(`Error`);
+            document.getElementById("responseDiv").innerHTML = `
+            ${longLinkHref(value)} is an invalid URL.<br>`
         }
 
     }
@@ -62,7 +63,7 @@
     setInterval(analyticsGenerator, 1000);
 
     function shortLinkHref(link) {
-        let finalLink = window.location.protocol + window.location.host + link;
+        let finalLink = window.location.protocol + "//" + window.location.host + link;
         return `<a href='${link}' target='_blank'> ${finalLink}<a/>`;
     }
     function longLinkHref(link) {

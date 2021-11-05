@@ -7,12 +7,18 @@ import {
   updateStatus,
 } from "../models/links.js";
 import { randomBytes } from "crypto";
+import { URL } from "url";
 
 export async function shorten(request, response) {
   let inputLink = request.body.originalLink;
-  let shortLink = await shortenLink(request.twirlUser.id, inputLink);
-  shortLink.shortLink = "/l/" + shortLink.shortLink;
-  return response.send(shortLink);
+  try {
+    new URL(inputLink);
+    let shortLink = await shortenLink(request.twirlUser.id, inputLink);
+    shortLink.shortLink = "/l/" + shortLink.shortLink;
+    return response.send(shortLink);
+  } catch (e) {
+    return response.send({ status: false });
+  }
 }
 
 export async function goToLink(request, response) {
