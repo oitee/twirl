@@ -64,3 +64,11 @@ export async function fetchAnalytics(userID) {
   );
   return res.rows;
 }
+
+export async function updateStatus(link, status) {
+  let res = await pool.query(
+    "UPDATE links SET enabled=$1 WHERE short_link=$2 RETURNING short_link",
+    [status, link]
+  );
+  return res.rows.length > 0;
+}

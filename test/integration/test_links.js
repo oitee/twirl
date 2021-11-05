@@ -4,6 +4,8 @@ import {
   shortenLink,
   expandLink,
   analytics,
+  disableLink,
+  enableLink,
 } from "../../src/controllers/links.js";
 import { pool, poolStart } from "../../src/db/connection.js";
 
@@ -31,8 +33,6 @@ async function testAnalytics() {
   for (let i = 0; i < 10; i++) {
     await expandLink(shortLink3Alice.shortLink);
   }
- 
-
 
   // The idea, here, is to shorten link2 last.
   // SetTimeout does not return a promise
@@ -40,24 +40,57 @@ async function testAnalytics() {
   // this call-back fn expects two functions, res and rej
   // the invocation of the res fn, implies completion (or resulution) of the promise
   // this is why, we pass the result of shortening to res, which is inside setTimeout
-  
-  
+
   await new Promise((resolve, reject) =>
     setTimeout(() => resolve(shortenLink(alice, link2)), 100)
   );
 
   let mockReq = { twirlUser: { id: alice } };
   let analyticsResult;
-  let mockRes = {send : (object) => analyticsResult = object.data};
+  let mockRes = { send: (object) => (analyticsResult = object.data) };
 
   await analytics(mockReq, mockRes);
-  
+
   assert.equal(analyticsResult[0]["original_link"], link3);
   assert.equal(analyticsResult[1]["original_link"], link2);
   assert.equal(analyticsResult[2]["original_link"], link1);
   assert.equal(analyticsResult[0]["accessed_count"], 10);
   assert.equal(analyticsResult[1]["accessed_count"], 0);
   assert.equal(analyticsResult[2]["accessed_count"], 0);
+
+  //----------------------------------------------------------------
+  // ENABLE/DISABLE LINKS 
+  //----------------------------------------------------------------
+  
+  let updateStatus;
+
+  let mockReq2 = { params: { id: shortLink3Alice.shortLink } };
+  let mockRes2 = { send: (object) => (updateStatus = object.status) };
+
+  await disableLink(mockReq2, mockRes2);
+  assert(updateStatus, "Status for disabling shortened link should be true");
+
+  await analytics(mockReq, mockRes);
+  assert(!analyticsResult[0]["enabled"]);
+  assert(analyticsResult[1]["enabled"]);
+  assert(analyticsResult[2]["enabled"]);
+
+  mockReq2.params.id = "abcd1??";
+  await disableLink(mockReq2, mockRes2);
+  assert(!updateStatus, "Status for disabling invalid link should be false");
+
+  mockReq2.params.id = shortLink3Alice.shortLink;
+  await enableLink(mockReq2, mockRes2);
+  assert(updateStatus, "Status for enabling shortened link should be true");
+
+  await analytics(mockReq, mockRes);
+  assert(analyticsResult[0]["enabled"]);
+  assert(analyticsResult[1]["enabled"]);
+  assert(analyticsResult[2]["enabled"]);
+
+  mockReq2.params.id = "abcd1??";
+  await enableLink(mockReq2, mockRes2);
+  assert(!updateStatus, "Status for enabling invalid link should be false");
 }
 
 async function testLinkShortening() {

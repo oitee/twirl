@@ -29,6 +29,10 @@ router.post("/l/shorten", links.shorten);
 
 router.get("/l/:id", links.goToLink);
 
+router.get("/l/disable/:id", links.disableLink);
+
+router.get("/l/enable/id", links.enableLink);
+
 router.get("/analytics", links.analytics);
 
 router.get("/home", users.home);

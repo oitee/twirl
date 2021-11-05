@@ -4,9 +4,9 @@ import {
   fetchLongLink,
   fetchShortLink,
   fetchAnalytics,
+  updateStatus,
 } from "../models/links.js";
 import { randomBytes } from "crypto";
-import { SESSION_COOKIE } from "../constants.js";
 
 export async function shorten(request, response) {
   let inputLink = request.body.originalLink;
@@ -53,4 +53,16 @@ export async function analytics(request, response) {
   data.map((row) => (row.short_link = "/l/" + row.short_link));
 
   return response.send({ data: data });
+}
+
+export async function disableLink(request, response) {
+  let shortLink = request.params.id;
+  let status = await updateStatus(shortLink, false);
+  return response.send({ status: status });
+}
+
+export async function enableLink(request, response) {
+  let shortLink = request.params.id;
+  let status = await updateStatus(shortLink, true);
+  return response.send({ status: status });
 }
