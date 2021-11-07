@@ -17,7 +17,11 @@ export async function shorten(request, response) {
     shortLink.shortLink = "/l/" + shortLink.shortLink;
     return response.send(shortLink);
   } catch (e) {
-    return response.send({ status: false });
+    if(inputLink.startsWith("http")){
+      return response.send({ status: false });
+    }
+    request.body.originalLink = "http://" + inputLink;
+    return await shorten(request, response);
   }
 }
 

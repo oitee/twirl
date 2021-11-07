@@ -100,7 +100,7 @@ async function testInvalidUrlShortening() {
   //----------------------------------------------------------------
   let alice = await insertUser("Alice", "testPassword", "normal");
   let linkCreationResult = 1;
-  let mockReq3 = { body: { originalLink: "1234" }, twirlUser: { id: alice } };
+  let mockReq3 = { body: { originalLink: "" }, twirlUser: { id: alice } };
   let mockRes3 = { send: (object) => (linkCreationResult = object.status) };
   await shorten(mockReq3, mockRes3);
   assert(!linkCreationResult, "Invalid URLs should not be shortened");
