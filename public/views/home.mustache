@@ -90,6 +90,7 @@
             document.getElementById("responseDiv").innerHTML = `
             ${longLinkHref(value)} is an invalid URL.<br>`
         }
+        await analyticsGenerator();
 
     }
 
@@ -117,7 +118,7 @@
         document.getElementById("analyticsDiv").innerHTML = `${heading} <table class="table table-striped"> ${headerRow} ${resTable} </table>`
     };
     analyticsGenerator();
-    setInterval(analyticsGenerator, 1000);
+    setInterval(analyticsGenerator, 30000);
 
     function shortLinkHref(link) {
         let finalLink = window.location.protocol + "//" + window.location.host + link;
@@ -138,6 +139,7 @@
         else {
             await fetch(`/l/enable/${link}`, { method: "POST" });
         }
+        await analyticsGenerator();
     }
 
 </script>
