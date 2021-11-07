@@ -24,7 +24,7 @@ async function auth(request, response, next) {
 }
 
 function redirectIfNotHTTPS(request, response, next){
-  if(request.headers["X-Forwarded-Proto"] !== "https" && ONLY_HTTPS){
+  if(request.headers["x-forwarded-proto"] !== "https" && ONLY_HTTPS){
     return response.redirect("https://" + request.hostname + request.originalUrl);
   }
   return next();
