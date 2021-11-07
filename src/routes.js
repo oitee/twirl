@@ -27,13 +27,11 @@ router.get("/", (request, response) => response.redirect("/home"));
 
 router.post("/l/shorten", links.shorten);
 
+router.post("/l/disable/:id", links.disableLink);
 
-router.get("/l/disable/:id", links.disableLink);
-
-router.get("/l/enable/:id", links.enableLink);
+router.post("/l/enable/:id", links.enableLink);
 
 router.get("/l/:id", links.goToLink);
-
 
 router.get("/analytics", links.analytics);
 

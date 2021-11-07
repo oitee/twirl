@@ -133,10 +133,10 @@
     async function updateStatus(link, currentStatus) {
         link = link.substring(3);
         if (currentStatus) {
-            await fetch(`/l/disable/${link}`, { method: "GET" });
+            await fetch(`/l/disable/${link}`, { method: "POST" });
         }
         else {
-            await fetch(`/l/enable/${link}`, { method: "GET" });
+            await fetch(`/l/enable/${link}`, { method: "POST" });
         }
     }
 

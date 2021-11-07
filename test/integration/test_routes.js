@@ -345,9 +345,9 @@ async function basicRouteTests(port) {
   // TESTS FOR AUTHENTICATED ROUTE ACCESS
   // -----------------------------------------------------------------
 
-  await assertNoAccessWithoutSession("GET", "/analytics");
+  await assertNoAccessWithoutSession("POST", "/analytics");
 
-  await assertNoAccessWithoutSession("GET", `/l/disable/1234`);
+  await assertNoAccessWithoutSession("POST", `/l/disable/1234`);
 }
 
 beforeAll(async () => {
