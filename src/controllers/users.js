@@ -137,7 +137,7 @@ function cookieAtributes() {
   };
 
   if (ONLY_HTTPS) {
-    attributes.Secure = true;
+    attributes.secure = true;
   }
   return attributes;
 }
