@@ -68,7 +68,6 @@
             <div class="col-sm-12">
                 <div id="responseDiv"></div>
                 <div id="analyticsDiv" class="table-responsive">
-                    <h2> Analytics</h2>
                 </div><br>
             </div>
         </div>
@@ -108,14 +107,13 @@
                 </tr>
             `).join(' ');
             });
-        let heading = resTable.length > 0 ? `<h2> Analytics </h2>` : "";
         let headerRow = `<tr>
             <th style="text-align:center" scope="col">Original Link</th>
             <th style="text-align:center" scope="col">Short Link &nbsp;</th>
             <th style="text-align:center" scope="col">Acccesed Count &nbsp;</th>
             <th style="text-align:center" scope="col">Action &nbsp;</th>
                 </tr>`;
-        document.getElementById("analyticsDiv").innerHTML = `${heading} <table class="table table-striped"> ${headerRow} ${resTable} </table>`
+        document.getElementById("analyticsDiv").innerHTML = `<table class="table table-striped"> ${headerRow} ${resTable} </table>`
     };
     analyticsGenerator();
     setInterval(analyticsGenerator, 30000);
