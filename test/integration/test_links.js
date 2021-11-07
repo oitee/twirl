@@ -6,7 +6,7 @@ import {
   analytics,
   disableLink,
   enableLink,
-  shorten
+  shorten,
 } from "../../src/controllers/links.js";
 import { pool, poolStart } from "../../src/db/connection.js";
 
@@ -65,7 +65,10 @@ async function testAnalytics() {
 
   let updateStatus;
 
-  let mockReq2 = { params: { id: shortLink3Alice.shortLink } };
+  let mockReq2 = {
+    params: { id: shortLink3Alice.shortLink },
+    twirlUser: { id: alice },
+  };
   let mockRes2 = { send: (object) => (updateStatus = object.status) };
 
   await disableLink(mockReq2, mockRes2);

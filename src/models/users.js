@@ -2,11 +2,12 @@ import { pool } from "../db/connection.js";
 import { v4 as uuidv4 } from "uuid";
 
 export async function fetchUser(column, value) {
+  column = "users." + column;
   let res = await pool.query(
-    `SELECT * from users where ${column}=$1 limit 1`,
+    `SELECT users.*,roles.name AS role from users join roles on users.role_id=roles.id where ${column}=$1 limit 1`,
     [value]
   );
-  if(res.rows.length > 0){
+  if (res.rows.length > 0) {
     return res.rows[0];
   }
   return null;

@@ -65,10 +65,19 @@ export async function fetchAnalytics(userID) {
   return res.rows;
 }
 
-export async function updateStatus(link, status) {
+export async function fetchAllAnalytics() {
+  let res = await pool.query(`
+    SELECT original_link, short_link, accessed_count, enabled,users.username 
+    FROM links JOIN users ON users.id=links.user_id 
+    ORDER BY links.accessed_count DESC, links.created_at DESC;
+  `);
+  return res.rows;
+}
+
+export async function updateStatus(userID, link, status) {
   let res = await pool.query(
-    "UPDATE links SET enabled=$1 WHERE short_link=$2 RETURNING short_link",
-    [status, link]
+    "UPDATE links SET enabled=$1 WHERE short_link=$2 AND user_id=$3 RETURNING short_link",
+    [status, link, userID]
   );
   return res.rows.length > 0;
 }

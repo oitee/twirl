@@ -4,6 +4,7 @@ import {
   fetchLongLink,
   fetchShortLink,
   fetchAnalytics,
+  fetchAllAnalytics,
   updateStatus,
 } from "../models/links.js";
 import { randomBytes } from "crypto";
@@ -17,7 +18,7 @@ export async function shorten(request, response) {
     shortLink.shortLink = "/l/" + shortLink.shortLink;
     return response.send(shortLink);
   } catch (e) {
-    if(inputLink.startsWith("http")){
+    if (inputLink.startsWith("http")) {
       return response.send({ status: false });
     }
     request.body.originalLink = "http://" + inputLink;
@@ -59,20 +60,26 @@ export async function expandLink(link) {
 }
 
 export async function analytics(request, response) {
-  let data = await fetchAnalytics(request.twirlUser.id);
-  data.map((row) => (row.short_link = "/l/" + row.short_link));
+  const userRole = request.twirlUser.role;
+  if (userRole !== "admin") {
+    let data = await fetchAnalytics(request.twirlUser.id);
+    data.map((row) => (row.short_link = "/l/" + row.short_link));
+    return response.send({ data: data, userRole: userRole });
+  }
 
-  return response.send({ data: data });
+  let data = await fetchAllAnalytics();
+  data.map((row) => (row.short_link = "/l/" + row.short_link));
+  return response.send({ data: data, userRole: userRole });
 }
 
 export async function disableLink(request, response) {
   let shortLink = request.params.id;
-  let status = await updateStatus(shortLink, false);
+  let status = await updateStatus(request.twirlUser.id, shortLink, false);
   return response.send({ status: status });
 }
 
 export async function enableLink(request, response) {
   let shortLink = request.params.id;
-  let status = await updateStatus(shortLink, true);
+  let status = await updateStatus(request.twirlUser.id, shortLink, true);
   return response.send({ status: status });
 }
