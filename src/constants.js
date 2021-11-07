@@ -23,3 +23,5 @@ export const PG_SSL_CONNECTION = process.env.PG_SSL_CONNECTION === "true";
 export const COOKIE_SECRET = process.env.COOKIE_SECRET;
 
 export const PORT_NUMBER = parseInt(process.env.PORT || "80");
+
+export const RECAPTCHA_SECRET = process.env.RECAPTCHA_SECRET;

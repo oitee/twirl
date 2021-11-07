@@ -1,6 +1,7 @@
-import { SESSION_COOKIE } from "../constants.js";
+import { SESSION_COOKIE, RECAPTCHA_SECRET } from "../constants.js";
 import { fetchUser as fetchUser, insertUser } from "../models/users.js";
 import crypto from "crypto";
+import fetch from "node-fetch";
 
 export function home(request, response) {
   return response.render("home.mustache", {
@@ -28,6 +29,13 @@ export async function create(request, response) {
   if (request.body.password.length < 6) {
     return response.render("signup.mustache", {
       message: "Password too short",
+    });
+  }
+  
+  let isValidCaptcha = await validateCaptcha(request);
+  if (!isValidCaptcha) {
+    return response.render("signup.mustache", {
+      message: "Invalid Captcha",
     });
   }
 
@@ -110,4 +118,21 @@ function homeIfSessionExists(request, response) {
     return true;
   }
   return false;
+}
+
+async function validateCaptcha(request) {
+  if (RECAPTCHA_SECRET == "EXEMPTED") {
+    return true;
+  }
+  let captchaParams = new URLSearchParams();
+  captchaParams.append("secret", RECAPTCHA_SECRET);
+  captchaParams.append("response", request.body["g-recaptcha-response"]);
+  let captchaResponse = await fetch(
+    "https://www.google.com/recaptcha/api/siteverify",
+    {
+      method: "POST",
+      body: captchaParams,
+    }
+  ).then((res) => res.json());
+  return captchaResponse.success;
 }
