@@ -93,9 +93,9 @@
 
     }
     function generateTableRow(
-        role, { original_link, accessed_count, short_link, enabled, username }) {
+        currentUsername, role, { original_link, accessed_count, short_link, enabled, username }) {
         let extraRow = role === "admin" ? `<td style="text-align:center">${username}</td>` : ``;
-
+        let toggleButton = currentUsername === username ? `<a href="#" onclick="return updateStatus('${short_link}', ${enabled})">Toggle</a></td>` : "";
         return `
             <tr>
                 ${extraRow}
@@ -103,7 +103,7 @@
             <td style="text-align:center">${shortLinkHref(short_link)} &nbsp;</td>
             <td style="text-align:center">${accessed_count}</td>
             <td style="text-align:center"> ${enabled ? "Live" : "Disabled"} &nbsp&nbsp
-                <a href="#" onclick="return updateStatus('${short_link}', ${enabled})">Toggle</a></td>
+                ${toggleButton}
                 </tr>
             `
     }
@@ -124,7 +124,7 @@
         let res = await fetch('/analytics', { method: "GET", headers: { "content-type": "application/json" } })
             .then(res => res.json());
 
-        let resTable = res.data.map((row) => generateTableRow(res.userRole, row)).join(' ');
+        let resTable = res.data.map((row) => generateTableRow(res.userName, res.userRole, row)).join(' ');
         let headerRow = generateHeaderRow(res.userRole);
         document.getElementById("analyticsDiv").innerHTML = `<table class="table table-striped"> ${headerRow} ${resTable} </table>`
     };

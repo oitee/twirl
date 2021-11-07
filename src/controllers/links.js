@@ -64,12 +64,12 @@ export async function analytics(request, response) {
   if (userRole !== "admin") {
     let data = await fetchAnalytics(request.twirlUser.id);
     data.map((row) => (row.short_link = "/l/" + row.short_link));
-    return response.send({ data: data, userRole: userRole });
+    return response.send({ data: data, userRole: userRole, userName: request.twirlUser.username });
   }
 
   let data = await fetchAllAnalytics();
   data.map((row) => (row.short_link = "/l/" + row.short_link));
-  return response.send({ data: data, userRole: userRole });
+  return response.send({ data: data, userRole: userRole, userName: request.twirlUser.username });
 }
 
 export async function disableLink(request, response) {
