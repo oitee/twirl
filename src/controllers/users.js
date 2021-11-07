@@ -25,6 +25,12 @@ export async function create(request, response) {
   }
 
   const username = request.body.username;
+  if (request.body.password.length < 6) {
+    return response.render("signup.mustache", {
+      message: "Password too short",
+    });
+  }
+
   const password = hashPassword(request.body.password);
   let userID = await insertUser(username, password, "normal");
   if (userID) {
@@ -35,14 +41,16 @@ export async function create(request, response) {
     });
     return response.redirect("/home");
   }
-  return response.render("signup.mustache", { message: "Username already exists" });
+  return response.render("signup.mustache", {
+    message: "Username already exists",
+  });
 }
 
 export function initiateLogIn(request, response) {
   if (homeIfSessionExists(request, response)) {
     return;
   }
-  return response.render("login.mustache", {message: "Please Log In"});
+  return response.render("login.mustache", { message: "Please Log In" });
 }
 
 export async function createSession(request, response) {

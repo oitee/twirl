@@ -48,7 +48,7 @@ async function basicRouteTests(port) {
   // -----------------------------------------------------------------
   let parameters = new URLSearchParams();
   parameters.append("username", "user1");
-  parameters.append("password", "123");
+  parameters.append("password", "1234567");
   let loginResponse = await fetch(`${baseUrl}/login`, {
     method: "POST",
     body: parameters,
@@ -95,6 +95,25 @@ async function basicRouteTests(port) {
     "GET /home (redirect); status should be 200"
   );
   assert(responseRedirectHome.headers.get("set-cookie") == undefined);
+
+  // -----------------------------------------------------------------
+  // POST /signup WITH SHORT PASSWORD
+  // -----------------------------------------------------------------
+  let parametersShortPassword = new URLSearchParams();
+  parametersShortPassword.append("username", "Sukumar");
+  parametersShortPassword.append("password", "Ray");
+  const signUpResponseShortPassword = await fetch(`${baseUrl}/signup`, {
+    method: "POST",
+    body: parametersShortPassword,
+    redirect: "manual",
+  });
+  assert(
+    (await signUpResponseShortPassword.text()).includes(
+      "Password too short"
+    ),
+    "POST /sign up with short password should return error message"
+  );
+  assert(signUpResponseShortPassword.headers.get("set-cookie") == undefined);
 
   // -----------------------------------------------------------------
   // POST /login (with correct credentials)
