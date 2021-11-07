@@ -1,11 +1,11 @@
 import express from "express";
 import * as users from "./controllers/users.js";
 import * as links from "./controllers/links.js";
-import { UNAUTHENTICATED_ROUTE_MATCHERS, SESSION_COOKIE } from "./constants.js";
+import { UNAUTHENTICATED_ROUTE_MATCHERS, SESSION_COOKIE, ONLY_HTTPS } from "./constants.js";
 let router = express.Router();
 export default router;
 
-router.use(auth);
+router.use(redirectIfNotHTTPS, auth);
 
 async function auth(request, response, next) {
   if (
@@ -21,6 +21,13 @@ async function auth(request, response, next) {
   );
   delete request.twirlUser.password;
   next();
+}
+
+function redirectIfNotHTTPS(request, response, next){
+  if(request.headers["X-Forwarded-Proto"] !== "https" && ONLY_HTTPS){
+    return response.redirect("https://" + request.hostname + request.originalUrl);
+  }
+  return next();
 }
 
 router.get("/", (request, response) => response.redirect("/home"));

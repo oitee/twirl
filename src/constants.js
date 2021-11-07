@@ -25,3 +25,5 @@ export const COOKIE_SECRET = process.env.COOKIE_SECRET;
 export const PORT_NUMBER = parseInt(process.env.PORT || "80");
 
 export const RECAPTCHA_SECRET = process.env.RECAPTCHA_SECRET;
+
+export const ONLY_HTTPS = process.env.ONLY_HTTPS === "true"; 

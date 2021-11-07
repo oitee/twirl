@@ -1,4 +1,4 @@
-import { SESSION_COOKIE, RECAPTCHA_SECRET } from "../constants.js";
+import { SESSION_COOKIE, RECAPTCHA_SECRET, ONLY_HTTPS } from "../constants.js";
 import { fetchUser as fetchUser, insertUser } from "../models/users.js";
 import crypto from "crypto";
 import fetch from "node-fetch";
@@ -31,7 +31,7 @@ export async function create(request, response) {
       message: "Password too short",
     });
   }
-  
+
   let isValidCaptcha = await validateCaptcha(request);
   if (!isValidCaptcha) {
     return response.render("signup.mustache", {
@@ -41,12 +41,9 @@ export async function create(request, response) {
 
   const password = hashPassword(request.body.password);
   let userID = await insertUser(username, password, "normal");
+
   if (userID) {
-    response.cookie(SESSION_COOKIE, userID, {
-      maxAge: 9000000,
-      httpOnly: true,
-      signed: true,
-    });
+    response.cookie(SESSION_COOKIE, userID, cookieAtributes());
     return response.redirect("/home");
   }
   return response.render("signup.mustache", {
@@ -74,11 +71,7 @@ export async function createSession(request, response) {
     });
   }
   if (matchPassword(userInDB.password, password)) {
-    response.cookie(SESSION_COOKIE, userInDB.id, {
-      maxAge: 9000000,
-      httpOnly: true,
-      signed: true,
-    });
+    response.cookie(SESSION_COOKIE, userInDB.id, cookieAtributes());
     return response.redirect("/home");
   }
   return response.render("login.mustache", {
@@ -135,4 +128,16 @@ async function validateCaptcha(request) {
     }
   ).then((res) => res.json());
   return captchaResponse.success;
+}
+
+function cookieAtributes() {
+  let attributes = {
+    httpOnly: true,
+    signed: true,
+  };
+
+  if (ONLY_HTTPS) {
+    attributes.Secure = true;
+  }
+  return attributes;
 }
