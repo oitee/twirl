@@ -95,7 +95,11 @@
     function generateTableRow(
         currentUsername, role, { original_link, accessed_count, short_link, enabled, username }) {
         let extraRow = role === "admin" ? `<td style="text-align:center">${username}</td>` : ``;
-        let toggleButton = currentUsername === username ? `<a href="#" onclick="return updateStatus('${short_link}', ${enabled})">Toggle</a></td>` : "";
+        let toggleButton = `<a href="#" onclick="return updateStatus('${short_link}', ${enabled})">Toggle</a></td>`;
+        if (role === "admin" && username !== currentUsername) {
+            toggleButton = "";
+        }
+
         return `
             <tr>
                 ${extraRow}
