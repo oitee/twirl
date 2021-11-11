@@ -68,6 +68,8 @@ To run the system (environment variables for cookie secret, PostgreSQL connectio
 ```bash
 COOKIE_SECRET=<secret>  PG_CONNECTION_STRING=postgres://<username>:<password>@localhost:5432/twirl PORT=4001  RECAPTCHA_SECRET=<secret> node app.js 
 ```
+To by-pass reCAPTCHA validation, use 'EXEMPTED' for the environment variable RECAPTCHA_SECRET
+
 To start the system locally, with sample values for cookie secret:
 
 ```bash
