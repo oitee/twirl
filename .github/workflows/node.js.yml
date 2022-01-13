@@ -55,4 +55,5 @@ jobs:
         PG_CONNECTION_STRING: 'postgres://postgres:otee@localhost:5432/twirl_test'
         PORT: 4001
         RECAPTCHA_SECRET: EXEMPTED
+        CUSTOM_DOMAIN_NAME: twirl.otee.dev
 

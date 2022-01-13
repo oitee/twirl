@@ -9,6 +9,9 @@ export async function incrementCounter() {
 }
 
 export async function addShortenedLink(userID, longLink, shortLink) {
+  // console.log({userID})
+  // console.log({longLink})
+  // console.log({shortLink})
   try {
     await pool.query(
       `INSERT INTO links 

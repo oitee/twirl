@@ -322,8 +322,7 @@ async function basicRouteTests(port) {
   // -----------------------------------------------------------------
   // GET /l/shortLink WITH NO SESSION
   // -----------------------------------------------------------------
-
-  let expansionRes = await fetch(`${baseUrl}${resBody.shortLink}`, {
+  let expansionRes = await fetch(`${baseUrl}${resBody.shortLinkPath}`, {
     method: "GET",
     redirect: "manual",
   });
@@ -343,7 +342,7 @@ async function basicRouteTests(port) {
   // GET /l/shortLink WITH SESSION
   // -----------------------------------------------------------------
 
-  expansionRes = await fetch(`${baseUrl}${resBody.shortLink}`, {
+  expansionRes = await fetch(`${baseUrl}${resBody.shortLinkPath}`, {
     method: "GET",
     redirect: "manual",
     headers: extractSessionCookie(signUpResponse),

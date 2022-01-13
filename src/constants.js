@@ -26,4 +26,6 @@ export const PORT_NUMBER = parseInt(process.env.PORT || "80");
 
 export const RECAPTCHA_SECRET = process.env.RECAPTCHA_SECRET;
 
-export const ONLY_HTTPS = process.env.ONLY_HTTPS === "true"; 
+export const ONLY_HTTPS = process.env.ONLY_HTTPS === "true";
+
+export const CUSTOM_DOMAIN_NAME = process.env.CUSTOM_DOMAIN_NAME;

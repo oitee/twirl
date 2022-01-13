@@ -4,8 +4,8 @@
   "description": "",
   "main": "",
   "scripts": {
-    "test": "RECAPTCHA_SECRET=EXEMPTED PORT=4001 COOKIE_SECRET=eiffeltowerdelhiindia12345678900 PG_CONNECTION_STRING=postgres://postgres@localhost:5432/twirl_test NODE_OPTIONS=--experimental-vm-modules jest --coverage=true -i",
-    "start_local": "PORT=4001 COOKIE_SECRET=eiffeltowerdelhiindia12345678900 PG_CONNECTION_STRING=postgres://postgres@localhost:5432/twirl  nodemon $1",
+    "test": "CUSTOM_DOMAIN_NAME=localhost:4001 RECAPTCHA_SECRET=EXEMPTED PORT=4001 COOKIE_SECRET=eiffeltowerdelhiindia12345678900 PG_CONNECTION_STRING=postgres://postgres@localhost:5432/twirl_test NODE_OPTIONS=--experimental-vm-modules jest --coverage=true -i",
+    "start_local": "CUSTOM_DOMAIN_NAME=localhost:4001 PORT=4001 COOKIE_SECRET=eiffeltowerdelhiindia12345678900 PG_CONNECTION_STRING=postgres://postgres@localhost:5432/twirl  nodemon $1",
     "start": "node app.js",
     "github_test": "NODE_OPTIONS=--experimental-vm-modules jest --coverage=true -i"
   },

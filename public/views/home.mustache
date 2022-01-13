@@ -80,6 +80,7 @@
         let value = document.getElementById("longLinkID").value;
         let requestObj = JSON.stringify({ originalLink: value });
         let res = await fetch('/l/shorten', { method: 'POST', headers: { "content-type": "application/json" }, body: requestObj }).then(res => res.json());
+        //console.log(res);
         if (res.status) {
             document.getElementById("responseDiv").innerHTML = `
             ${longLinkHref(value)} has been shortened to ${shortLinkHref(res.shortLink)} <br>
@@ -93,9 +94,9 @@
 
     }
     function generateTableRow(
-        currentUsername, role, { original_link, accessed_count, short_link, enabled, username }) {
+        currentUsername, role, { original_link, accessed_count, enabled, username, short_link, short_link_path }) {
         let extraRow = role === "admin" ? `<td style="text-align:center">${username}</td>` : ``;
-        let toggleButton = `<a href="#" onclick="return updateStatus('${short_link}', ${enabled})">Toggle</a></td>`;
+        let toggleButton = `<a href="#" onclick="return updateStatus('${short_link_path}', ${enabled})">Toggle</a></td>`;
         if (role === "admin" && username !== currentUsername) {
             toggleButton = "";
         }
@@ -136,8 +137,7 @@
     setInterval(analyticsGenerator, 30000);
 
     function shortLinkHref(link) {
-        let finalLink = window.location.protocol + "//" + window.location.host + link;
-        return `<a href='${link}' target='_blank'> ${finalLink}<a/>`;
+        return `<a href='${link}' target='_blank'> ${link}<a/>`;
     }
     function longLinkHref(link) {
         let truncatedLink = link;
@@ -146,13 +146,12 @@
         }
         return `<a href='${link}' target='_blank'> ${truncatedLink}<a/>`
     }
-    async function updateStatus(link, currentStatus) {
-        link = link.substring(3);
+    async function updateStatus(linkPath, currentStatus) {
         if (currentStatus) {
-            await fetch(`/l/disable/${link}`, { method: "POST" });
+            await fetch(`/l/disable/${linkPath}`, { method: "POST" });
         }
         else {
-            await fetch(`/l/enable/${link}`, { method: "POST" });
+            await fetch(`/l/enable/${linkPath}`, { method: "POST" });
         }
         await analyticsGenerator();
     }
