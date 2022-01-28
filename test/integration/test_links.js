@@ -23,14 +23,14 @@ import { pool, poolStart } from "../../src/db/connection.js";
   Expand short link1 and short link2
 */
 
-async function testAnalytics() {
+async function testAnalytics() {  
   let alice = await insertUser("Alice", "testPassword", "normal");
   let link1 = "https://otee.dev/2021/11/03/diwali-hack-week.html";
   let link2 = "https://github.com/oitee";
   let link3 = "https://google.com";
   let shortLink1Alice = await shortenLink(alice, link1);
   let shortLink3Alice = await shortenLink(alice, link3);
-
+ 
   for (let i = 0; i < 10; i++) {
     await expandLink(shortLink3Alice.shortLink);
   }
@@ -42,9 +42,7 @@ async function testAnalytics() {
   // the invocation of the res fn, implies completion (or resulution) of the promise
   // this is why, we pass the result of shortening to res, which is inside setTimeout
 
-  await new Promise((resolve, reject) =>
-    setTimeout(() => resolve(shortenLink(alice, link2)), 100)
-  );
+  await shortenLink(alice, link2)
 
   let mockReq = { twirlUser: { id: alice } };
   let analyticsResult;
