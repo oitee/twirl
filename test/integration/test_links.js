@@ -252,7 +252,10 @@ beforeEach(async () => {
     created_at TIMESTAMP WITH TIME ZONE,
     updated_at TIMESTAMP WITH TIME ZONE,
     PRIMARY KEY (user_id, original_link)
-);`);
+);
+ ALTER TABLE users ADD status TEXT;
+ ALTER TABLE users ALTER COLUMN status SET DEFAULT 'unverified';
+ UPDATE users SET status='unverified';`);
 });
 afterAll(async () => {
   await pool.end();

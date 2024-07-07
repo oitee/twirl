@@ -40,8 +40,8 @@ export async function fetchLongLink(shortLink) {
   let client = await pool.connect();
   try {
     let res = await client.query(
-      `SELECT original_link FROM links 
-      WHERE short_link=$1 AND enabled='t' LIMIT 1`,
+      `SELECT original_link FROM links k JOIN users u ON k.user_id=u.id
+      WHERE short_link=$1 AND enabled='t' AND (u.status='verified' OR k.accessed_count <10) LIMIT 1`,
       [shortLink]
     );
     if (res.rows.length > 0) {
