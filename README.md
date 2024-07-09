@@ -6,7 +6,7 @@ Twirl is a web app that shortens URLs. It allows users to sign up (verified with
 
 The app provides for two user-roles: admin and ordinary. Ordinary users can view the list of top 50 links shortened by them, the number of times each such short link has been accessed and an option to enable or disable them. Admin users can access the top 50 short links created by the app; however, an admin user is not given the permission to disable or enable links created by other users. 
 
-The project is accompanied by complete integration tests using Jest framework. The app has been deployed on Heroku. It can be accessed here: [https://oteetwirl.herokuapp.com/login](https://oteetwirl.herokuapp.com/login).
+The project is accompanied by complete integration tests using Jest framework. The app has been deployed on GCP. It can be accessed here: [twirl.otee.dev](https://twirl.otee.dev/login).
 
 ## System Design
 
@@ -20,48 +20,7 @@ As the system uses PostgreSQL deployed on Docker, the relevant Docker container 
 docker-compose up
 ```
 
-The database schema will need to be created:
-```SQL
-\c postgres;
-DROP DATABASE IF EXISTS twirl;
-CREATE DATABASE twirl;
-\connect twirl;
-
-CREATE TABLE roles (
-    id SERIAL PRIMARY KEY,
-    name TEXT
-);
-
-CREATE TABLE users (
-    id UUID PRIMARY KEY,
-    username TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE,
-    role_id INTEGER REFERENCES roles (id)
-);
-
-INSERT INTO roles (name) values ('admin') , ('normal'), ('superAdmin');
-
-CREATE TABLE counters(
-    id TEXT PRIMARY KEY,
-    value INTEGER  
-);
-INSERT INTO counters (id, value) values ('link_counter', 0);
-UPDATE counters SET value=value+1 WHERE id='link_counter' RETURNING value;
-
-CREATE TABLE links (
-    user_id UUID REFERENCES users (id),
-    original_link TEXT NOT NULL,
-    short_link TEXT NOT NULL,
-    enabled BOOLEAN NOT NULL DEFAULT 'true',
-    accessed_count INTEGER DEFAULT 0,
-    created_at TIMESTAMP WITH TIME ZONE,
-    updated_at TIMESTAMP WITH TIME ZONE,
-    PRIMARY KEY (user_id, original_link)
-);
-
-```
-
+The database schema will need to be created using [setup_database.sql](setup_database.sql).
 
 To run the system (environment variables for cookie secret, PostgreSQL connection string, and reCAPTCHA secret will need to be provided):
 
